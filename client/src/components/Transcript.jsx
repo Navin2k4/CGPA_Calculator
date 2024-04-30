@@ -1,7 +1,7 @@
 import React from 'react';
 import html2pdf from 'html2pdf.js';
 
-function Transcript({ studentInfo, numSemesters, semesterData, cgpa }) {
+function Transcript({ studentInfo, numSemesters, semesterData, cgpa, electiveData }) {
     const handleDownloadPDF = () => {
         const element = document.getElementById('transcript-container');
 
@@ -22,10 +22,56 @@ function Transcript({ studentInfo, numSemesters, semesterData, cgpa }) {
         html2pdf().from(element).set(opt).save();
     };
 
+    const getElectivesForSemester = (semesterIndex) => {
+        return electiveData && electiveData.length > semesterIndex ? electiveData[semesterIndex] : [];
+    };
 
+    const renderSemester1Details = () => {
+        const semesterIndex = 0; // Semester 1 index
+        const subjects = semesterData[semesterIndex] || []; // Subjects for Semester 1
+        const electives = getElectivesForSemester(semesterIndex); // Electives for Semester 1
+
+        return (
+            <div>
+                <h4 className="mb-4"><strong>Semester {semesterIndex}</strong></h4>
+                <table className="w-full border-collapse border border-gray-400">
+                    <thead>
+                        <tr>
+                            <th className="border border-gray-400 px-4 py-2 text-left">Course Title</th>
+                            <th className="border border-gray-400 px-4 py-2 text-left">Course Code</th>
+                            <th className="border border-gray-400 px-4 py-2 text-left">Total Credits</th>
+                            <th className="border border-gray-400 px-4 py-2 text-left">Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {/* Render subjects */}
+                        {subjects.map((subject, subjectIndex) => (
+                            <tr key={subjectIndex}>
+                                <td className="border border-gray-400 px-4 py-2">{subject.title}</td>
+                                <td className="border border-gray-400 px-4 py-2">{subject.code}</td>
+                                <td className="border border-gray-400 px-4 py-2">{subject.credits}</td>
+                                <td className="border border-gray-400 px-4 py-2">{subject.grade}</td>
+                            </tr>
+                        ))}
+                        {/* Render electives */}
+                        {electives.map((elective, electiveIndex) => (
+                            <tr key={electiveIndex}>
+                                <td className="border border-gray-400 px-4 py-2">{elective.name}</td>
+                                <td className="border border-gray-400 px-4 py-2">{elective.code}</td>
+                                <td className="border border-gray-400 px-4 py-2">{elective.credits}</td>
+                                <td className="border border-gray-400 px-4 py-2">{elective.grade}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        );
+    };
     return (
         <>
             <div id="transcript-container" className="font-sans text-base leading-normal">
+                {renderSemester1Details()}
+
                 <h2 className="text-2xl text-center mb-6">Student Data</h2>
                 <div className="mb-8">
                     <table>
@@ -57,7 +103,6 @@ function Transcript({ studentInfo, numSemesters, semesterData, cgpa }) {
                             </tr>
                         </tbody>
                     </table>
-
                 </div>
                 <div>
                     <h3 className="mb-2 text-lg"><strong>Semester Details</strong></h3>
@@ -80,6 +125,29 @@ function Transcript({ studentInfo, numSemesters, semesterData, cgpa }) {
                                             <td className="border border-gray-400 px-4 py-2">{subject.code}</td>
                                             <td className="border border-gray-400 px-4 py-2">{subject.credits}</td>
                                             <td className="border border-gray-400 px-4 py-2">{subject.grade}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                            {/* Render elective data for the semester */}
+                            <h4 className="mb-4 mt-8"><strong>Electives for Semester {semesterIndex + 1}</strong></h4>
+                            <table className="w-full border-collapse border border-gray-400">
+                                <thead>
+                                    <tr>
+                                        <th className="border border-gray-400 px-4 py-2 text-left">Elective Name</th>
+                                        <th className="border border-gray-400 px-4 py-2 text-left">Elective Code</th>
+                                        <th className="border border-gray-400 px-4 py-2 text-left">Total Credits</th>
+                                        <th className="border border-gray-400 px-4 py-2 text-left">Grade</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {/* Render elective data */}
+                                    {getElectivesForSemester(semesterIndex).map((elective, electiveIndex) => (
+                                        <tr key={electiveIndex}>
+                                            <td className="border border-gray-400 px-4 py-2">{elective.name}</td>
+                                            <td className="border border-gray-400 px-4 py-2">{elective.code}</td>
+                                            <td className="border border-gray-400 px-4 py-2">{elective.credits}</td>
+                                            <td className="border border-gray-400 px-4 py-2">{elective.grade}</td>
                                         </tr>
                                     ))}
                                 </tbody>

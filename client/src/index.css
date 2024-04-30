@@ -2,34 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-.slide-down-enter {
-    animation: slide-down 0.5s ease forwards;
-}
-
-.slide-up-leave {
-    animation: slide-up 0.5s ease forwards;
-}
-
-@keyframes slide-down {
-    from {
-        opacity: 0;
-        transform: translateY(-50px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes slide-up {
-    from {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    to {
-        opacity: 0;
-        transform: translateY(-50px);
-    }
+html {
+    background-color: gainsboro;
 }

@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Transcript from '../components/Transcript';
-import { Select, TextInput, Button, FloatingLabel, Alert } from 'flowbite-react';
+import { Select, TextInput, Button, FloatingLabel, Alert, Label, Radio } from 'flowbite-react';
 
 function Calculator() {
     const gradeScale = {
@@ -13,29 +13,35 @@ function Calculator() {
         'U': 0 // Re Attempt(Areer) or Absent
     };
 
-    const [formData, setFormData] = useState([]);
-    const [cgpa, setCgpa] = useState(null);
-    const [numSemesters, setNumSemesters] = useState(0);
     const [studentInfo, setStudentInfo] = useState({
         name: '',
         rollNumber: '',
         registerNumber: '',
         department: ''
     });
-    console.log(formData, numSemesters, cgpa, studentInfo);
+
+    const [formData, setFormData] = useState([]);
+    const [cgpa, setCgpa] = useState(null);
+    const [numSemesters, setNumSemesters] = useState(0);
     const [showTranscript, setShowTranscript] = useState(false);
+    const [showElectiveFields, setShowElectiveFields] = useState([]);
+    const [numElectives, setNumElectives] = useState([]);
+    const [electiveData, setElectiveData] = useState([]);
+
+    // console.log("StudentInfo : ", studentInfo);
+    console.log("formData : ", formData);
+    console.log("electiveData : ", electiveData);
+    // console.log("NumSemester : ", numSemesters);
+    // console.log("NumElective : ", numElectives);
 
     const handleSubmit = (event) => {
         event.preventDefault();
-
         let totalCredits = 0;
         let totalMarks = 0;
-        const selectedCourses = new Set(); // To ensure uniqueness of selected courses
-
+        const selectedCourses = new Set();
         formData.forEach((semesterSubjects) => {
             let semesterTotalCredits = 0;
             let semesterTotalMarks = 0;
-
             semesterSubjects.forEach((subject) => {
                 const course = `${subject.title} (${subject.code})`;
                 if (selectedCourses.has(course)) {
@@ -43,52 +49,82 @@ function Calculator() {
                     return;
                 }
                 selectedCourses.add(course);
-                // Parse credits as a number
                 const credits = parseFloat(subject.credits);
                 semesterTotalCredits += credits;
                 semesterTotalMarks += gradeScale[subject.grade] * credits;
             });
-
-            // Add semester total credits and marks to overall totals
             totalCredits += semesterTotalCredits;
             totalMarks += semesterTotalMarks;
-            console.log(totalCredits, totalMarks);
         });
-
         const currentCgpa = totalMarks / totalCredits;
         setCgpa(currentCgpa);
-
         setShowTranscript(true);
     };
 
     const handleStudentInfoChange = (event) => {
         const { name, value } = event.target;
+        // Check if the name is not 'department' or 'numSemesters'
+        const capitalizedValue = (name !== 'department' && name !== 'numSemesters') ? value.toUpperCase() : value;
         setStudentInfo((prevStudentInfo) => ({
             ...prevStudentInfo,
-            [name]: value
+            [name]: capitalizedValue
         }));
     };
+
 
     const handleNumSemestersChange = (event) => {
         const newNumSemesters = parseInt(event.target.value);
         setNumSemesters(newNumSemesters);
 
-        setFormData(prevFormData => {
+        setShowElectiveFields((prevShowElectiveFields) => {
+            const newShowElectiveFields = [...prevShowElectiveFields];
+
+            // Preserve existing values for previously rendered semesters
+            for (let i = 0; i < prevShowElectiveFields.length; i++) {
+                if (i >= newNumSemesters) {
+                    break; // Stop updating when reaching the new number of semesters
+                }
+                newShowElectiveFields[i] = prevShowElectiveFields[i];
+            }
+
+            // Fill remaining slots with false for new semesters
+            for (let i = prevShowElectiveFields.length; i < newNumSemesters; i++) {
+                newShowElectiveFields.push(false);
+            }
+
+            return newShowElectiveFields;
+        });
+        setNumElectives((prevNumElectives) => {
+            const newNumElectives = [...prevNumElectives];
+
+            // Preserve existing values for previously rendered semesters
+            for (let i = 0; i < prevNumElectives.length; i++) {
+                if (i >= newNumSemesters) {
+                    break; // Stop updating when reaching the new number of semesters
+                }
+                newNumElectives[i] = prevNumElectives[i];
+            }
+
+            // Fill remaining slots with 0 for new semesters
+            for (let i = prevNumElectives.length; i < newNumSemesters; i++) {
+                newNumElectives.push(0);
+            }
+
+            return newNumElectives;
+        });
+        setFormData((prevFormData) => {
             let newFormData = [...prevFormData];
 
-            // Remove extra semesters if reducing the number of semesters
             if (newNumSemesters < newFormData.length) {
                 newFormData = newFormData.slice(0, newNumSemesters);
             }
 
-            // Preserve existing form data
             for (let i = newFormData.length; i < newNumSemesters; i++) {
                 newFormData.push([]);
             }
 
             return newFormData;
         });
-
     };
 
     const handleNumSubjectsChange = (event, semesterIndex) => {
@@ -96,24 +132,21 @@ function Calculator() {
         const numSubjects = parseInt(value);
 
         if (isNaN(numSubjects) || numSubjects < 1) {
-            setFormData(prevFormData => {
+            setFormData((prevFormData) => {
                 let newFormData = [...prevFormData];
 
-                // Remove all subjects if reducing the number of subjects to 0 or less
                 if (numSubjects < 1) {
                     newFormData[semesterIndex - 1] = [];
                 } else {
-                    // Otherwise, remove extra subjects if reducing the number of subjects
                     newFormData[semesterIndex - 1] = newFormData[semesterIndex - 1].slice(0, numSubjects);
                 }
 
                 return newFormData;
             });
         } else {
-            // Otherwise, set the number of subjects as specified
-            setFormData(prevFormData => {
+            setFormData((prevFormData) => {
                 const newFormData = [...prevFormData];
-                const existingSubjects = newFormData[semesterIndex - 1] || []; // Get existing subjects
+                const existingSubjects = newFormData[semesterIndex - 1] || [];
                 const newSubjects = new Array(numSubjects).fill({
                     title: '',
                     code: '',
@@ -131,25 +164,96 @@ function Calculator() {
         }
     };
 
+    const handleNumElectivesChange = (event, semesterIndex) => {
+        const { value } = event.target;
+        const numElectives = parseInt(value);
+
+        if (isNaN(numElectives) || numElectives < 0) {
+            // Prevent increasing number of electives beyond 0
+            return;
+        }
+
+        setNumElectives((prevNumElectives) => {
+            const newNumElectives = [...prevNumElectives];
+            newNumElectives[semesterIndex - 1] = numElectives;
+
+            // If number of electives is set to 0, clear elective data
+            if (numElectives === 0) {
+                setElectiveData((prevElectiveData) => {
+                    const newElectiveData = [...prevElectiveData];
+                    newElectiveData[semesterIndex - 1] = [];
+                    return newElectiveData;
+                });
+            } else {
+                // Initialize elective data if not already initialized
+                if (!electiveData[semesterIndex - 1]) {
+                    setElectiveData((prevElectiveData) => {
+                        const newElectiveData = [...prevElectiveData];
+                        newElectiveData[semesterIndex - 1] = new Array(numElectives).fill({
+                            name: '',
+                            code: '',
+                            credits: 0,
+                            grade: ''
+                        });
+                        return newElectiveData;
+                    });
+                } else {
+                    // If elective data already exists, adjust its length
+                    setElectiveData((prevElectiveData) => {
+                        const newElectiveData = [...prevElectiveData];
+                        const existingElectives = newElectiveData[semesterIndex - 1] || [];
+                        const newElectiveArray = new Array(numElectives).fill(null).map((_, index) => {
+                            if (existingElectives[index]) {
+                                return existingElectives[index];
+                            } else {
+                                return {
+                                    name: '',
+                                    code: '',
+                                    credits: 0,
+                                    grade: ''
+                                };
+                            }
+                        });
+                        newElectiveData[semesterIndex - 1] = newElectiveArray;
+                        return newElectiveData;
+                    });
+                }
+            }
+
+            return newNumElectives;
+        });
+    };
+
+
 
     const handleSubjectChange = (event, semesterIndex, subjectIndex, key) => {
         const { value } = event.target;
-        setFormData(prevFormData => {
+        setFormData((prevFormData) => {
             const newFormData = [...prevFormData];
             const newSubject = { ...newFormData[semesterIndex - 1][subjectIndex], [key]: value };
-            newFormData[semesterIndex - 1] = [...newFormData[semesterIndex - 1]]; // Ensure immutability
+            newFormData[semesterIndex - 1] = [...newFormData[semesterIndex - 1]];
             newFormData[semesterIndex - 1][subjectIndex] = newSubject;
             return newFormData;
         });
     };
 
+    const handleElectiveSubjectChange = (event, semesterIndex, electiveIndex, key) => {
+        const { value } = event.target;
+        setElectiveData((prevElectiveData) => {
+            const newElectiveData = [...prevElectiveData];
+            const newElective = { ...newElectiveData[semesterIndex - 1][electiveIndex], [key]: value };
+            newElectiveData[semesterIndex - 1][electiveIndex] = newElective;
+            return newElectiveData;
+        });
+    };
+
     const renderSemesterInputs = () => {
         const inputs = [];
-        for (let i = 1; i <= formData.length; i++) {
+        for (let i = 1; i <= numSemesters; i++) {
             inputs.push(
                 <div className={`w-full`} key={i}>
                     <h3 className='text-violet-700 font-bold text-xl text-center py-6'>SEMESTER {i} {i % 2 === 0 ? "Even" : "Odd"}</h3>
-                    <div className={`slide-${i <= numSemesters ? 'down-enter' : 'up-leave'}`}>
+                    <div>
                         <FloatingLabel
                             variant='filled'
                             type="number"
@@ -161,6 +265,27 @@ function Calculator() {
                         />
                     </div>
                     {renderSubjectInputs(i)}
+                    <div className="flex items-center gap-2 py-4" >
+                        <Label htmlFor={`elective-${i}`}>Having Elective in Semester {i}</Label>
+                        <Radio id={`elective-${i}`} name={`elective-${i}`} value="yes" onChange={() => setShowElectiveFields((prevShowElectiveFields) => prevShowElectiveFields.map((value, index) => index === i - 1 ? true : value))} />
+                        <Label>Yes</Label>
+                        <Radio id={`elective-${i}`} name={`elective-${i}`} value="no" onChange={() => setShowElectiveFields((prevShowElectiveFields) => prevShowElectiveFields.map((value, index) => index === i - 1 ? false : value))} />
+                        <Label>No</Label>
+                    </div>
+                    {showElectiveFields[i - 1] && (
+                        <div className='w-full'>
+                            <FloatingLabel
+                                className='w-full'
+                                variant='filled'
+                                label={`Number of Electives in Semester ${i}`}
+                                type="number"
+                                min='0'
+                                value={numElectives[i - 1]}
+                                onChange={(e) => handleNumElectivesChange(e, i)}
+                            />
+                            {renderElectiveInputs(i, numElectives[i - 1])}
+                        </div>
+                    )}
                 </div>
             );
         }
@@ -171,22 +296,11 @@ function Calculator() {
     const renderSubjectInputs = (semesterIndex) => {
         const subjects = formData[semesterIndex - 1] || [];
         return (
-            <div className={`slide-${semesterIndex <= numSemesters ? 'down-enter' : 'up-leave'}`}>
+            <div>
                 {subjects.map((subject, subjectIndex) => (
                     <div className='flex flex-wrap w-full' key={subjectIndex}>
                         <div className='w-full'>
                             <h4 className='text-lg text-violet-600 font-semibold'>SUBJECT {subjectIndex + 1}</h4>
-                        </div>
-                        <div className='w-full'>
-                            <FloatingLabel
-                                variant='filled'
-                                label='Course Name'
-                                type="text"
-                                value={subject.title}
-                                onChange={(e) => handleSubjectChange(e, semesterIndex, subjectIndex, 'title')}
-                                key={`title_${semesterIndex}_${subjectIndex}`}
-                                required
-                            />
                         </div>
                         <div className='w-full'>
                             <FloatingLabel
@@ -196,6 +310,17 @@ function Calculator() {
                                 value={subject.code}
                                 onChange={(e) => handleSubjectChange(e, semesterIndex, subjectIndex, 'code')}
                                 key={`code_${semesterIndex}_${subjectIndex}`}
+                                required
+                            />
+                        </div>
+                        <div className='w-full'>
+                            <FloatingLabel
+                                variant='filled'
+                                label='Course Name'
+                                type="text"
+                                value={subject.title}
+                                onChange={(e) => handleSubjectChange(e, semesterIndex, subjectIndex, 'title')}
+                                key={`title_${semesterIndex}_${subjectIndex}`}
                                 required
                             />
                         </div>
@@ -230,18 +355,75 @@ function Calculator() {
                             </div>
                             <Alert className='w-full md:auto'>This will be reflected on your CGPA</Alert>
                         </div>
-
-
                     </div>
                 ))}
             </div>
         );
     };
 
-
+    const renderElectiveInputs = (semesterIndex) => {
+        const electives = electiveData[semesterIndex - 1] || [];
+        return (
+            <div>
+                {electives.map((elective, electiveIndex) => (
+                    <div key={`elective-${semesterIndex}-${electiveIndex}`}>
+                        <h4 className='text-lg text-violet-600 font-semibold'>ELECTIVE {electiveIndex + 1}</h4>
+                        <div className='w-full'>
+                            <FloatingLabel
+                                variant='filled'
+                                label={`Elective Name ${electiveIndex + 1}`}
+                                type="text"
+                                required
+                                value={elective.name}
+                                onChange={(e) => handleElectiveSubjectChange(e, semesterIndex, electiveIndex, 'name')}
+                            />
+                        </div>
+                        <div className='w-full'>
+                            <FloatingLabel
+                                variant='filled'
+                                label={`Elective Code ${electiveIndex + 1}`}
+                                type="text"
+                                required
+                                value={elective.code}
+                                onChange={(e) => handleElectiveSubjectChange(e, semesterIndex, electiveIndex, 'code')}
+                            />
+                        </div>
+                        <div className='flex flex-col md:flex-row justify-start items-center gap-4 w-full'>
+                            <div className="w-full md:w-1/3">
+                                <FloatingLabel
+                                    variant='filled'
+                                    label={`Total Credits ${electiveIndex + 1}`}
+                                    type="number"
+                                    min='1'
+                                    required
+                                    value={elective.credits}
+                                    onChange={(e) => handleElectiveSubjectChange(e, semesterIndex, electiveIndex, 'credits')}
+                                />
+                            </div>
+                            <div className='w-full md:w-1/2'>
+                                <Select
+                                    required
+                                    value={elective.grade}
+                                    onChange={(e) => handleElectiveSubjectChange(e, semesterIndex, electiveIndex, 'grade')}
+                                >
+                                    <option value="">Select Grade</option>
+                                    {Object.keys(gradeScale).map((grade) => (
+                                        <option key={grade} value={grade}>
+                                            {grade}
+                                        </option>
+                                    ))}
+                                </Select>
+                            </div>
+                            <Alert className='w-full md:auto'>This will be reflected on your CGPA</Alert>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        );
+    };
 
     return (
-        <div className="p-4 max-w-3xl mx-auto min-h-screen">
+        <div className="p-4 max-w-3xl mx-auto min-h-screen ">
             <h1 className="text-center mb-4">Enter Your Details</h1>
             <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
                 <FloatingLabel
@@ -315,10 +497,11 @@ function Calculator() {
                     numSemesters={numSemesters}
                     semesterData={formData}
                     cgpa={cgpa}
+                    electiveData={electiveData}
+
                 />
             )}
         </div>
-
     );
 }
 
