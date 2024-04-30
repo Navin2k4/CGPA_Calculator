@@ -28,18 +28,19 @@ function Calculator() {
     const [numElectives, setNumElectives] = useState([]);
     const [electiveData, setElectiveData] = useState([]);
 
-    // console.log("StudentInfo : ", studentInfo);
+    console.log("StudentInfo : ", studentInfo);
     console.log("formData : ", formData);
     console.log("electiveData : ", electiveData);
-    // console.log("NumSemester : ", numSemesters);
-    // console.log("NumElective : ", numElectives);
+    console.log("NumSemester : ", numSemesters);
+    console.log("NumElective : ", numElectives);
+    console.log("CGPA :", cgpa);
 
     const handleSubmit = (event) => {
         event.preventDefault();
         let totalCredits = 0;
         let totalMarks = 0;
         const selectedCourses = new Set();
-        formData.forEach((semesterSubjects) => {
+        formData.forEach((semesterSubjects, semesterIndex) => {
             let semesterTotalCredits = 0;
             let semesterTotalMarks = 0;
             semesterSubjects.forEach((subject) => {
@@ -53,6 +54,20 @@ function Calculator() {
                 semesterTotalCredits += credits;
                 semesterTotalMarks += gradeScale[subject.grade] * credits;
             });
+
+            // Include elective subjects in the calculation
+            electiveData[semesterIndex].forEach((elective) => {
+                const course = `${elective.name} (${elective.code})`;
+                if (selectedCourses.has(course)) {
+                    alert('You cannot select the same course in multiple semesters.');
+                    return;
+                }
+                selectedCourses.add(course);
+                const credits = parseFloat(elective.credits);
+                semesterTotalCredits += credits;
+                semesterTotalMarks += gradeScale[elective.grade] * credits;
+            });
+
             totalCredits += semesterTotalCredits;
             totalMarks += semesterTotalMarks;
         });
@@ -252,7 +267,7 @@ function Calculator() {
         for (let i = 1; i <= numSemesters; i++) {
             inputs.push(
                 <div className={`w-full`} key={i}>
-                    <h3 className='text-violet-700 font-bold text-xl text-center py-6'>SEMESTER {i} {i % 2 === 0 ? "Even" : "Odd"}</h3>
+                    <h3 className='text-black font-bold text-2xl text-center py-6'>SEMESTER {i} {i % 2 === 0 ? "EVEN" : "ODD"}</h3>
                     <div>
                         <FloatingLabel
                             variant='filled'
@@ -265,13 +280,32 @@ function Calculator() {
                         />
                     </div>
                     {renderSubjectInputs(i)}
-                    <div className="flex items-center gap-2 py-4" >
-                        <Label htmlFor={`elective-${i}`}>Having Elective in Semester {i}</Label>
-                        <Radio id={`elective-${i}`} name={`elective-${i}`} value="yes" onChange={() => setShowElectiveFields((prevShowElectiveFields) => prevShowElectiveFields.map((value, index) => index === i - 1 ? true : value))} />
-                        <Label>Yes</Label>
-                        <Radio id={`elective-${i}`} name={`elective-${i}`} value="no" onChange={() => setShowElectiveFields((prevShowElectiveFields) => prevShowElectiveFields.map((value, index) => index === i - 1 ? false : value))} />
-                        <Label>No</Label>
-                    </div>
+
+                    {/* Only electives are fro 5th semesters for CSE */}
+                    {(i > 4) && (
+                        <div className="flex items-center gap-2 py-4" >
+                            <Label htmlFor={`elective-${i}`} className=' font-bold'>Having Elective in Semester {i}</Label>
+                            <Radio id={`elective-${i}`} name={`elective-${i}`} value="yes" onChange={() => setShowElectiveFields((prevShowElectiveFields) => prevShowElectiveFields.map((value, index) => index === i - 1 ? true : value))} />
+                            <Label>Yes</Label>
+                            <Radio
+                                required
+                                id={`elective-${i}`}
+                                name={`elective-${i}`}
+                                value="no"
+                                onChange={() => {
+                                    setShowElectiveFields((prevShowElectiveFields) => prevShowElectiveFields.map((value, index) => index === i - 1 ? false : value));
+                                    // Clear elective data for this semester
+                                    setElectiveData((prevElectiveData) => {
+                                        const newElectiveData = [...prevElectiveData];
+                                        newElectiveData[i - 1] = []; // Set to empty array
+                                        return newElectiveData;
+                                    });
+                                }}
+                            />
+                            <Label>No</Label>
+                        </div>
+                    )}
+
                     {showElectiveFields[i - 1] && (
                         <div className='w-full'>
                             <FloatingLabel
@@ -299,8 +333,8 @@ function Calculator() {
             <div>
                 {subjects.map((subject, subjectIndex) => (
                     <div className='flex flex-wrap w-full' key={subjectIndex}>
-                        <div className='w-full'>
-                            <h4 className='text-lg text-violet-600 font-semibold'>SUBJECT {subjectIndex + 1}</h4>
+                        <div className='w-full py-4'>
+                            <h4 className='text-2xl text-violet-600 font-semibold'>SUBJECT {subjectIndex + 1}</h4>
                         </div>
                         <div className='w-full'>
                             <FloatingLabel
@@ -353,7 +387,7 @@ function Calculator() {
                                     ))}
                                 </Select>
                             </div>
-                            <Alert className='w-full md:auto'>This will be reflected on your CGPA</Alert>
+                            <Alert color="warning" className='w-full md:auto font-bold'>This will be reflected on your CGPA !</Alert>
                         </div>
                     </div>
                 ))}
@@ -367,7 +401,10 @@ function Calculator() {
             <div>
                 {electives.map((elective, electiveIndex) => (
                     <div key={`elective-${semesterIndex}-${electiveIndex}`}>
-                        <h4 className='text-lg text-violet-600 font-semibold'>ELECTIVE {electiveIndex + 1}</h4>
+                        <div className='w-full py-4'>
+
+                            <h4 className='text-2xl text-orange-600 font-semibold'>ELECTIVE {electiveIndex + 1}</h4>
+                        </div>
                         <div className='w-full'>
                             <FloatingLabel
                                 variant='filled'
@@ -414,7 +451,7 @@ function Calculator() {
                                     ))}
                                 </Select>
                             </div>
-                            <Alert className='w-full md:auto'>This will be reflected on your CGPA</Alert>
+                            <Alert color="warning" className='w-full md:auto font-bold'>This will be reflected on your CGPA !</Alert>
                         </div>
                     </div>
                 ))}
@@ -424,7 +461,7 @@ function Calculator() {
 
     return (
         <div className="p-4 max-w-3xl mx-auto min-h-screen ">
-            <h1 className="text-center mb-4">Enter Your Details</h1>
+            <h1 className="text-2xl text-center pb-6 font-bold">YOUR DETAILS</h1>
             <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
                 <FloatingLabel
                     variant='filled'
@@ -448,7 +485,7 @@ function Calculator() {
                 />
                 <FloatingLabel
                     variant='filled'
-                    type="text"
+                    type="number"
                     label='Register Number'
                     value={studentInfo.registerNumber}
                     onChange={handleStudentInfoChange}
@@ -482,6 +519,11 @@ function Calculator() {
                 />
 
                 {renderSemesterInputs()}
+
+
+                <Alert className='font-bold items-center'>TODO: To Add for any additional courses made during the academic year and other details </Alert>
+                <Alert className='font-bold items-center'>TODO: To display the subjects seperately which are "U"</Alert>
+
                 <Button type='submit' className='bg-violet-500'>Submit</Button>
 
                 <TextInput

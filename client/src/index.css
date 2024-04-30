@@ -3,5 +3,11 @@
 @tailwind utilities;
 
 html {
-    background-color: gainsboro;
+    background-color: rgb(237, 237, 237);
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
