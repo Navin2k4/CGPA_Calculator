@@ -32,14 +32,14 @@ function Transcript({ studentInfo, numSemesters, semesterData, cgpa, electiveDat
                 <h2 className="text-2xl text-center mb-6">Semester Details</h2>
                 {semesterData.map((subjects, semesterIndex) => (
                     <div key={semesterIndex} className="mb-8">
-                        <h3 className="mb-4"><strong>Semester {semesterIndex + 1}</strong></h3>
-                        <table className="w-full border-collapse border border-gray-400">
-                            <thead>
+                        <h3 className="mb-4 text-xl">Semester {semesterIndex + 1}{semesterIndex % 2 != 0 ? " EVEN" : " ODD"}</h3>
+                        <table className="w-full border-collapse border border-gray-800">
+                            <thead className=''>
                                 <tr>
-                                    <th className="border border-gray-400 px-4 py-2 text-left">Course Title</th>
-                                    <th className="border border-gray-400 px-4 py-2 text-left">Course Code</th>
-                                    <th className="border border-gray-400 px-4 py-2 text-left">Total Credits</th>
-                                    <th className="border border-gray-400 px-4 py-2 text-left">Grade</th>
+                                    <th className="border border-gray-400 px-4 py-2 text-center">Course Title</th>
+                                    <th className="border border-gray-400 px-4 py-2 text-center">Course Code</th>
+                                    <th className="border border-gray-400 px-4 py-2 text-center">Total Credits</th>
+                                    <th className="border border-gray-400 px-4 py-2 text-center">Grade</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -54,42 +54,45 @@ function Transcript({ studentInfo, numSemesters, semesterData, cgpa, electiveDat
                             </tbody>
                         </table>
                         {/* Render elective data for the semester */}
-                        {getElectivesForSemester(semesterIndex).length > 0 && (
-                            <div className="mt-4">
-                                <h4 className="mb-4"><strong>Electives of Semester {semesterIndex + 1}</strong></h4>
-                                <table className="w-full border-collapse border border-gray-400">
-                                    <thead>
-                                        <tr>
-                                            <th className="border border-gray-400 px-4 py-2 text-left">Elective Name</th>
-                                            <th className="border border-gray-400 px-4 py-2 text-left">Elective Code</th>
-                                            <th className="border border-gray-400 px-4 py-2 text-left">Total Credits</th>
-                                            <th className="border border-gray-400 px-4 py-2 text-left">Grade</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {/* Render elective data */}
-                                        {getElectivesForSemester(semesterIndex).map((elective, electiveIndex) => (
-                                            <tr key={electiveIndex}>
-                                                <td className="border border-gray-400 px-4 py-2">{elective.name}</td>
-                                                <td className="border border-gray-400 px-4 py-2">{elective.code}</td>
-                                                <td className="border border-gray-400 px-4 py-2">{elective.credits}</td>
-                                                <td className="border border-gray-400 px-4 py-2">{elective.grade}</td>
+                        {
+                            getElectivesForSemester(semesterIndex).length > 0 && (
+                                <div className="mt-4">
+                                    <h4 className="mb-4"><strong>Electives of Semester {semesterIndex + 1}</strong></h4>
+                                    <table className="w-full border-collapse border border-gray-400">
+                                        <thead>
+                                            <tr>
+                                                <th className="border border-gray-400 px-4 py-2 text-left">Elective Name</th>
+                                                <th className="border border-gray-400 px-4 py-2 text-left">Elective Code</th>
+                                                <th className="border border-gray-400 px-4 py-2 text-left">Total Credits</th>
+                                                <th className="border border-gray-400 px-4 py-2 text-left">Grade</th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
+                                        </thead>
+                                        <tbody>
+                                            {/* Render elective data */}
+                                            {getElectivesForSemester(semesterIndex).map((elective, electiveIndex) => (
+                                                <tr key={electiveIndex}>
+                                                    <td className="border border-gray-400 px-4 py-2">{elective.name}</td>
+                                                    <td className="border border-gray-400 px-4 py-2">{elective.code}</td>
+                                                    <td className="border border-gray-400 px-4 py-2">{elective.credits}</td>
+                                                    <td className="border border-gray-400 px-4 py-2">{elective.grade}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )
+                        }
                     </div>
-                ))}
+                ))
+                }
             </div>
         );
     };
 
     return (
         <>
-            <div id="transcript-container" className="font-sans text-base leading-normal">
-                <h2 className="text-2xl text-center mb-6">Student Data</h2>
+            <div id="transcript-container" className="font-sans text-base leading-normal py-4">
+                <h2 className="text-2xl text-center mb-6">{studentInfo.name} MARK DATA</h2>
                 <div className="mb-8">
                     <table>
                         <tbody>
@@ -123,7 +126,7 @@ function Transcript({ studentInfo, numSemesters, semesterData, cgpa, electiveDat
                 </div>
                 {renderSemesterDetails()}
                 <div>
-                    <h3 className="mb-2 text-lg"><strong>{cgpa !== null ? `CGPA: ${cgpa.toFixed(2)}` : ''}</strong></h3>
+                    <h3 className="mb-2 text-2xl"><strong>{cgpa !== null ? `CGPA : ${cgpa.toFixed(2)}` : ''}</strong></h3>
                 </div>
             </div>
             <div className="text-center m-8">

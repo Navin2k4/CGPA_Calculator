@@ -282,29 +282,33 @@ function Calculator() {
                     {renderSubjectInputs(i)}
 
                     {/* Only electives are fro 5th semesters for CSE */}
-                    {(i > 4) && (
-                        <div className="flex items-center gap-2 py-4" >
-                            <Label htmlFor={`elective-${i}`} className=' font-bold'>Having Elective in Semester {i}</Label>
-                            <Radio id={`elective-${i}`} name={`elective-${i}`} value="yes" onChange={() => setShowElectiveFields((prevShowElectiveFields) => prevShowElectiveFields.map((value, index) => index === i - 1 ? true : value))} />
-                            <Label>Yes</Label>
-                            <Radio
-                                required
-                                id={`elective-${i}`}
-                                name={`elective-${i}`}
-                                value="no"
-                                onChange={() => {
-                                    setShowElectiveFields((prevShowElectiveFields) => prevShowElectiveFields.map((value, index) => index === i - 1 ? false : value));
-                                    // Clear elective data for this semester
-                                    setElectiveData((prevElectiveData) => {
-                                        const newElectiveData = [...prevElectiveData];
-                                        newElectiveData[i - 1] = []; // Set to empty array
-                                        return newElectiveData;
-                                    });
-                                }}
-                            />
-                            <Label>No</Label>
-                        </div>
-                    )}
+                    {/* Only render elective fields for semesters greater than 4 */}
+                    <div className="flex items-center gap-2 py-4" >
+                        <Label htmlFor={`elective-${i}`} className=' font-bold'>Having Elective in Semester {i}</Label>
+                        <Radio id={`elective-${i}`} name={`elective-${i}`} value="yes" onChange={() => setShowElectiveFields((prevShowElectiveFields) => prevShowElectiveFields.map((value, index) => index === i - 1 ? true : value))} />
+                        <Label>Yes</Label>
+                        <Radio
+                            required
+                            id={`elective-${i}`}
+                            name={`elective-${i}`}
+                            value="no"
+                            onChange={() => {
+                                setShowElectiveFields((prevShowElectiveFields) => prevShowElectiveFields.map((value, index) => index === i - 1 ? false : value));
+                                // Clear elective data for this semester
+                                setElectiveData((prevElectiveData) => {
+                                    const newElectiveData = [...prevElectiveData];
+                                    newElectiveData[i - 1] = []; // Set to empty array
+                                    return newElectiveData;
+                                });
+                                setNumElectives((prevNumElectives) => {
+                                    const newNumElectives = [...prevNumElectives];
+                                    newNumElectives[i - 1] = 0; // Set number of electives to 0
+                                    return newNumElectives;
+                                });
+                            }}
+                        />
+                        <Label>No</Label>
+                    </div>
 
                     {showElectiveFields[i - 1] && (
                         <div className='w-full'>
@@ -523,6 +527,9 @@ function Calculator() {
 
                 <Alert className='font-bold items-center'>TODO: To Add for any additional courses made during the academic year and other details </Alert>
                 <Alert className='font-bold items-center'>TODO: To display the subjects seperately which are "U"</Alert>
+                <Alert className='font-bold items-center'>TODO: Connect To MONGODB and fetch the details based on the department selected</Alert>
+                <Alert className='font-bold items-center'>TODO: Make a POP up window to display the Transcript Not on the page itself</Alert>
+                <Alert className='font-bold items-center'>TODO: Option to view the pdf before downloading or show a previwe of that pdf</Alert>
 
                 <Button type='submit' className='bg-violet-500'>Submit</Button>
 
