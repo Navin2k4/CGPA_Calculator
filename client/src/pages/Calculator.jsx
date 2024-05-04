@@ -1,25 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Transcript from '../components/Transcript';
 import { Select, TextInput, Button, FloatingLabel, Alert, Label, Radio } from 'flowbite-react';
 
 function Calculator() {
-    const gradeScale = {
-        'O': 10,
-        'A+': 9,
-        'A': 8,
-        'B+': 7,
-        'B': 6,
-        'C': 5,
-        'U': 0 // Re Attempt(Areer) or Absent
-    };
-
-    const [studentInfo, setStudentInfo] = useState({
-        name: '',
-        rollNumber: '',
-        registerNumber: '',
-        department: ''
-    });
-
+    const gradeScale = { 'O': 10, 'A+': 9, 'A': 8, 'B+': 7, 'B': 6, 'C': 5, 'U': 0 };
+    const [studentInfo, setStudentInfo] = useState({ name: '', rollNumber: '', registerNumber: '', department: '' });
     const [formData, setFormData] = useState([]);
     const [cgpa, setCgpa] = useState(null);
     const [numSemesters, setNumSemesters] = useState(0);
@@ -28,13 +13,8 @@ function Calculator() {
     const [numElectives, setNumElectives] = useState([]);
     const [electiveData, setElectiveData] = useState([]);
 
-    console.log("StudentInfo : ", studentInfo);
-    console.log("formData : ", formData);
-    console.log("electiveData : ", electiveData);
-    console.log("NumSemester : ", numSemesters);
-    console.log("NumElective : ", numElectives);
-    console.log("CGPA :", cgpa);
-
+    const [departments, setDepartments] = useState([]);
+    console.log(studentInfo, formData, electiveData, numSemesters, numElectives, cgpa, departments);
     const handleSubmit = (event) => {
         event.preventDefault();
         let totalCredits = 0;
@@ -78,7 +58,6 @@ function Calculator() {
 
     const handleStudentInfoChange = (event) => {
         const { name, value } = event.target;
-        // Check if the name is not 'department' or 'numSemesters'
         const capitalizedValue = (name !== 'department' && name !== 'numSemesters') ? value.toUpperCase() : value;
         setStudentInfo((prevStudentInfo) => ({
             ...prevStudentInfo,
@@ -86,58 +65,43 @@ function Calculator() {
         }));
     };
 
-
     const handleNumSemestersChange = (event) => {
         const newNumSemesters = parseInt(event.target.value);
         setNumSemesters(newNumSemesters);
-
         setShowElectiveFields((prevShowElectiveFields) => {
             const newShowElectiveFields = [...prevShowElectiveFields];
-
-            // Preserve existing values for previously rendered semesters
             for (let i = 0; i < prevShowElectiveFields.length; i++) {
                 if (i >= newNumSemesters) {
-                    break; // Stop updating when reaching the new number of semesters
+                    break;
                 }
                 newShowElectiveFields[i] = prevShowElectiveFields[i];
             }
-
-            // Fill remaining slots with false for new semesters
             for (let i = prevShowElectiveFields.length; i < newNumSemesters; i++) {
                 newShowElectiveFields.push(false);
             }
-
             return newShowElectiveFields;
         });
         setNumElectives((prevNumElectives) => {
             const newNumElectives = [...prevNumElectives];
-
-            // Preserve existing values for previously rendered semesters
             for (let i = 0; i < prevNumElectives.length; i++) {
                 if (i >= newNumSemesters) {
-                    break; // Stop updating when reaching the new number of semesters
+                    break;
                 }
                 newNumElectives[i] = prevNumElectives[i];
             }
-
-            // Fill remaining slots with 0 for new semesters
             for (let i = prevNumElectives.length; i < newNumSemesters; i++) {
                 newNumElectives.push(0);
             }
-
             return newNumElectives;
         });
         setFormData((prevFormData) => {
             let newFormData = [...prevFormData];
-
             if (newNumSemesters < newFormData.length) {
                 newFormData = newFormData.slice(0, newNumSemesters);
             }
-
             for (let i = newFormData.length; i < newNumSemesters; i++) {
                 newFormData.push([]);
             }
-
             return newFormData;
         });
     };
@@ -463,6 +427,23 @@ function Calculator() {
         );
     };
 
+    useEffect(() => {
+        const fetchDepartments = async () => {
+            try {
+                const res = await fetch(`/api/departments/getdepartments`);
+                const data = await res.json();
+                if (res.ok) {
+                    setDepartments(data);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        fetchDepartments();
+    }, []);
+
+
+
     return (
         <div className="p-4 max-w-3xl mx-auto min-h-screen ">
             <h1 className="text-2xl text-center pb-6 font-bold">YOUR DETAILS</h1>
@@ -504,12 +485,11 @@ function Calculator() {
                     required
                 >
                     <option value="">Select Department</option>
-                    <option value="CSE - Computer Science and Engineering">Computer Science and Engineering (CSE)</option>
-                    <option value="ECE - Electronics and Communication Engineering">Electronics and Communication Engineering (ECE)</option>
-                    <option value="EEE - Electrical and Electronics Engineering">Electrical and Electronics Engineering (EEE)</option>
-                    <option value="IT - Information Technology">Information Technology (IT)</option>
-                    <option value="MECH - Mechanical Engineering">Mechanical Engineering (MECH)</option>
-                    <option value="CIVIL - Civil Engineering">Civil Engineering (CIVIL)</option>
+                    {departments.map(department => (
+                        <option key={department._id} value={`${department.department_acronym} - ${department.department_name}`}>
+                            {`${department.department_name} (${department.department_acronym})`}
+                        </option>
+                    ))}
                 </Select>
                 <FloatingLabel
                     variant='filled'
@@ -523,22 +503,20 @@ function Calculator() {
                 />
 
                 {renderSemesterInputs()}
-
-
+                <Button type='submit' className='bg-violet-500'>Submit</Button>
+            </form>
+            <section className='flex flex-col gap-3'>
                 <Alert className='font-bold items-center'>TODO: To Add for any additional courses made during the academic year and other details </Alert>
                 <Alert className='font-bold items-center'>TODO: To display the subjects seperately which are "U"</Alert>
                 <Alert className='font-bold items-center'>TODO: Connect To MONGODB and fetch the details based on the department selected</Alert>
                 <Alert className='font-bold items-center'>TODO: Make a POP up window to display the Transcript Not on the page itself</Alert>
                 <Alert className='font-bold items-center'>TODO: Option to view the pdf before downloading or show a previwe of that pdf</Alert>
-
-                <Button type='submit' className='bg-violet-500'>Submit</Button>
-
-                <TextInput
-                    type="text"
-                    readOnly
-                    value={cgpa !== null ? `CGPA: ${cgpa.toFixed(2)}` : 'Your CGPA Appears here'}
-                />
-            </form>
+            </section>
+            <TextInput
+                type="text"
+                readOnly
+                value={cgpa !== null ? `CGPA: ${cgpa.toFixed(2)}` : 'Your CGPA Appears here'}
+            />
 
             {showTranscript && (
                 <Transcript
@@ -550,6 +528,7 @@ function Calculator() {
 
                 />
             )}
+
         </div>
     );
 }
