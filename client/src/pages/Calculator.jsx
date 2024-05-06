@@ -9,18 +9,15 @@ function Calculator() {
     const [cgpa, setCgpa] = useState(null);
     const [numSemesters, setNumSemesters] = useState(0);
     const [showTranscript, setShowTranscript] = useState(false);
-    // const [showElectiveFields, setShowElectiveFields] = useState([]);
-    // const [numElectives, setNumElectives] = useState([]);
-    // const [electiveData, setElectiveData] = useState([]);
 
     const [departments, setDepartments] = useState([]);
     const [selectedDepartmentAcronym, setSelectedDepartmentAcronym] = useState('');
     const [semesters, setSemesters] = useState([]);
-    const [electives, setElectives] = useState([]); // New state for elective courses
+    const [electives, setElectives] = useState([]);
 
     console.log("Semester : ", semesters);
-    console.log("Depts :",departments);
-    console.log("Electives : ",electives);
+    console.log("Depts :", departments);
+    console.log("Electives : ", electives);
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -41,20 +38,6 @@ function Calculator() {
                 semesterTotalCredits += credits;
                 semesterTotalMarks += gradeScale[subject.grade] * credits;
             });
-
-            // Include elective subjects in the calculation
-            // electiveData[semesterIndex].forEach((elective) => {
-            //     const course = `${elective.name} (${elective.code})`;
-            //     if (selectedCourses.has(course)) {
-            //         alert('You cannot select the same course in multiple semesters.');
-            //         return;
-            //     }
-            //     selectedCourses.add(course);
-            //     const credits = parseFloat(elective.credits);
-            //     semesterTotalCredits += credits;
-            //     semesterTotalMarks += gradeScale[elective.grade] * credits;
-            // });
-
             totalCredits += semesterTotalCredits;
             totalMarks += semesterTotalMarks;
         });
@@ -71,7 +54,7 @@ function Calculator() {
             [name]: capitalizedValue
         }));
         if (name === 'department') {
-            const acronym = value.split(' - ')[0]; // Extract department acronym from selected value
+            const acronym = value.split(' - ')[0]; 
             setSelectedDepartmentAcronym(acronym);
         }
     };
@@ -79,32 +62,6 @@ function Calculator() {
     const handleNumSemestersChange = (event) => {
         const newNumSemesters = parseInt(event.target.value);
         setNumSemesters(newNumSemesters);
-        // setShowElectiveFields((prevShowElectiveFields) => {
-        //     const newShowElectiveFields = [...prevShowElectiveFields];
-        //     for (let i = 0; i < prevShowElectiveFields.length; i++) {
-        //         if (i >= newNumSemesters) {
-        //             break;
-        //         }
-        //         newShowElectiveFields[i] = prevShowElectiveFields[i];
-        //     }
-        //     for (let i = prevShowElectiveFields.length; i < newNumSemesters; i++) {
-        //         newShowElectiveFields.push(false);
-        //     }
-        //     return newShowElectiveFields;
-        // });
-        // setNumElectives((prevNumElectives) => {
-        //     const newNumElectives = [...prevNumElectives];
-        //     for (let i = 0; i < prevNumElectives.length; i++) {
-        //         if (i >= newNumSemesters) {
-        //             break;
-        //         }
-        //         newNumElectives[i] = prevNumElectives[i];
-        //     }
-        //     for (let i = prevNumElectives.length; i < newNumSemesters; i++) {
-        //         newNumElectives.push(0);
-        //     }
-        //     return newNumElectives;
-        // });
         setFormData((prevFormData) => {
             let newFormData = [...prevFormData];
             if (newNumSemesters < newFormData.length) {
@@ -154,67 +111,6 @@ function Calculator() {
         }
     };
 
-    // const handleNumElectivesChange = (event, semesterIndex) => {
-    //     const { value } = event.target;
-    //     const numElectives = parseInt(value);
-
-    //     if (isNaN(numElectives) || numElectives < 0) {
-    //         // Prevent increasing number of electives beyond 0
-    //         return;
-    //     }
-
-    //     setNumElectives((prevNumElectives) => {
-    //         const newNumElectives = [...prevNumElectives];
-    //         newNumElectives[semesterIndex - 1] = numElectives;
-
-    //         // If number of electives is set to 0, clear elective data
-    //         if (numElectives === 0) {
-    //             setElectiveData((prevElectiveData) => {
-    //                 const newElectiveData = [...prevElectiveData];
-    //                 newElectiveData[semesterIndex - 1] = [];
-    //                 return newElectiveData;
-    //             });
-    //         } else {
-    //             // Initialize elective data if not already initialized
-    //             if (!electiveData[semesterIndex - 1]) {
-    //                 setElectiveData((prevElectiveData) => {
-    //                     const newElectiveData = [...prevElectiveData];
-    //                     newElectiveData[semesterIndex - 1] = new Array(numElectives).fill({
-    //                         name: '',
-    //                         code: '',
-    //                         credits: 0,
-    //                         grade: ''
-    //                     });
-    //                     return newElectiveData;
-    //                 });
-    //             } else {
-    //                 // If elective data already exists, adjust its length
-    //                 setElectiveData((prevElectiveData) => {
-    //                     const newElectiveData = [...prevElectiveData];
-    //                     const existingElectives = newElectiveData[semesterIndex - 1] || [];
-    //                     const newElectiveArray = new Array(numElectives).fill(null).map((_, index) => {
-    //                         if (existingElectives[index]) {
-    //                             return existingElectives[index];
-    //                         } else {
-    //                             return {
-    //                                 name: '',
-    //                                 code: '',
-    //                                 credits: 0,
-    //                                 grade: ''
-    //                             };
-    //                         }
-    //                     });
-    //                     newElectiveData[semesterIndex - 1] = newElectiveArray;
-    //                     return newElectiveData;
-    //                 });
-    //             }
-    //         }
-
-    //         return newNumElectives;
-    //     });
-    // };
-
-
 
     const handleSubjectChange = (event, semesterIndex, subjectIndex, key) => {
         const { value } = event.target;
@@ -226,16 +122,6 @@ function Calculator() {
             return newFormData;
         });
     };
-
-    // const handleElectiveSubjectChange = (event, semesterIndex, electiveIndex, key) => {
-    //     const { value } = event.target;
-    //     setElectiveData((prevElectiveData) => {
-    //         const newElectiveData = [...prevElectiveData];
-    //         const newElective = { ...newElectiveData[semesterIndex - 1][electiveIndex], [key]: value };
-    //         newElectiveData[semesterIndex - 1][electiveIndex] = newElective;
-    //         return newElectiveData;
-    //     });
-    // };
 
     const renderSemesterInputs = () => {
         const inputs = [];
@@ -256,47 +142,6 @@ function Calculator() {
                     </div>
                     {renderSubjectInputs(i)}
 
-                    {/* <div className="flex items-center gap-2 py-4" >
-                        <Label htmlFor={`elective-${i}`} className=' font-bold'>Having Elective in Semester {i}</Label>
-                        <Radio id={`elective-${i}`} name={`elective-${i}`} value="yes" onChange={() => setShowElectiveFields((prevShowElectiveFields) => prevShowElectiveFields.map((value, index) => index === i - 1 ? true : value))} />
-                        <Label>Yes</Label>
-                        <Radio
-                            required
-                            id={`elective-${i}`}
-                            name={`elective-${i}`}
-                            value="no"
-                            onChange={() => {
-                                setShowElectiveFields((prevShowElectiveFields) => prevShowElectiveFields.map((value, index) => index === i - 1 ? false : value));
-                                // Clear elective data for this semester
-                                setElectiveData((prevElectiveData) => {
-                                    const newElectiveData = [...prevElectiveData];
-                                    newElectiveData[i - 1] = []; // Set to empty array
-                                    return newElectiveData;
-                                });
-                                setNumElectives((prevNumElectives) => {
-                                    const newNumElectives = [...prevNumElectives];
-                                    newNumElectives[i - 1] = 0; // Set number of electives to 0
-                                    return newNumElectives;
-                                });
-                            }}
-                        />
-                        <Label>No</Label>
-                    </div>
-
-                    {showElectiveFields[i - 1] && (
-                        <div className='w-full'>
-                            <FloatingLabel
-                                className='w-full'
-                                variant='filled'
-                                label={`Number of Electives in Semester ${i}`}
-                                type="number"
-                                min='0'
-                                value={numElectives[i - 1]}
-                                onChange={(e) => handleNumElectivesChange(e, i)}
-                            />
-                            {renderElectiveInputs(i, numElectives[i - 1])}
-                        </div>
-                    )} */}
                 </div>
             );
         }
@@ -307,6 +152,7 @@ function Calculator() {
     const renderSubjectInputs = (semesterIndex) => {
         const subjects = formData[semesterIndex - 1] || [];
         const semesterData = semesters.find(semester => semester.department_acronym === selectedDepartmentAcronym);
+        const electiveData = electives.find(elective => elective.department_acronym === selectedDepartmentAcronym);
 
         const selectedCourses = new Set();
 
@@ -317,14 +163,24 @@ function Calculator() {
 
         const handleCourseSelect = (event, subjectIndex) => {
             const selectedCourse = event.target.value;
-            const selectedCourseDetails = semesterData?.semesters[semesterIndex - 1]?.courses.find(course => {
-                return `${course.course_name} (${course.course_code})` === selectedCourse;
-            });
+            const regularCourse = semesterData?.semesters[semesterIndex - 1]?.courses.find(course =>
+                `${course.course_name} (${course.course_code})` === selectedCourse
+            );
 
-            if (selectedCourseDetails) {
-                handleSubjectChange({ target: { value: selectedCourseDetails.course_name } }, semesterIndex, subjectIndex, 'title');
-                handleSubjectChange({ target: { value: selectedCourseDetails.course_code } }, semesterIndex, subjectIndex, 'code');
-                handleSubjectChange({ target: { value: selectedCourseDetails.course_credits } }, semesterIndex, subjectIndex, 'credits');
+            if (regularCourse) {
+                handleSubjectChange({ target: { value: regularCourse.course_name } }, semesterIndex, subjectIndex, 'title');
+                handleSubjectChange({ target: { value: regularCourse.course_code } }, semesterIndex, subjectIndex, 'code');
+                handleSubjectChange({ target: { value: regularCourse.course_credits } }, semesterIndex, subjectIndex, 'credits');
+            } else {
+                const electiveCourse = electiveData?.verticals
+                    .flatMap(vertical => vertical.courses)
+                    .find(course => `${course.elective_name} (${course.elective_code})` === selectedCourse);
+
+                if (electiveCourse) {
+                    handleSubjectChange({ target: { value: electiveCourse.elective_name } }, semesterIndex, subjectIndex, 'title');
+                    handleSubjectChange({ target: { value: electiveCourse.elective_code } }, semesterIndex, subjectIndex, 'code');
+                    handleSubjectChange({ target: { value: electiveCourse.elective_credit } }, semesterIndex, subjectIndex, 'credits');
+                }
             }
         };
 
@@ -342,31 +198,43 @@ function Calculator() {
                                 onChange={(e) => handleCourseSelect(e, subjectIndex)}
                             >
                                 <option value="">Select Course</option>
-                                {(semesterData?.semesters[semesterIndex - 1]?.courses || []).map(course => {
-                                    const courseValue = `${course.course_name} (${course.course_code})`;
-                                    const isCourseSelected = selectedCourses.has(courseValue);
-                                    return (
-                                        <option
-                                            key={course._id}
-                                            value={courseValue}
-                                            disabled={isCourseSelected}
-                                        >
-                                            {isCourseSelected ? course.course_name : `${course.course_code} - ${course.course_name}`}
-                                        </option>
-                                    );
-                                })}
+                                <optgroup label="REGULAR COURSES">
+                                    {(semesterData?.semesters[semesterIndex - 1]?.courses || []).map(course => {
+                                        const courseValue = `${course.course_name} (${course.course_code})`;
+                                        const isCourseSelected = selectedCourses.has(courseValue);
+                                        return (
+                                            <option
+                                                key={course._id}
+                                                value={courseValue}
+                                                disabled={isCourseSelected}
+                                            >
+                                                {isCourseSelected ? course.course_name : `${course.course_code} - ${course.course_name}`}
+                                            </option>
+                                        );
+                                    })}
+                                </optgroup>
 
-                                {/* Display elective courses */}
-                                {electiveCourses.map(electiveCourse => (
-                                    <option
-                                        key={electiveCourse._id}
-                                        value={`${electiveCourse.elective_name} (${electiveCourse.elective_code})`}
-                                    >
-                                        {`${electiveCourse.elective_code} - ${electiveCourse.elective_name}`}
-                                    </option>
+                                {semesterIndex > 4 && electiveData?.verticals.map(vertical => (
+                                    <optgroup key={vertical.vertical_name} label={`VERTICAL ${vertical.vertical_number} - ${vertical.vertical_name}`}>
+                                        {vertical.courses.map(course => {
+                                            const courseValue = `${course.elective_name} (${course.elective_code})`;
+                                            const isCourseSelected = selectedCourses.has(courseValue);
+                                            return (
+                                                <option
+                                                    key={course._id}
+                                                    value={courseValue}
+                                                    disabled={isCourseSelected}
+                                                >
+                                                    {isCourseSelected ? course.elective_name : `${course.elective_code} - ${course.elective_name}`}
+                                                </option>
+                                            );
+                                        })}
+                                    </optgroup>
                                 ))}
+
                             </Select>
-                        </div><div className='w-full'>
+                        </div>
+                        <div className='w-full'>
                             <FloatingLabel
                                 variant='filled'
                                 label='Course Code'
@@ -375,6 +243,7 @@ function Calculator() {
                                 onChange={(e) => handleSubjectChange(e, semesterIndex, subjectIndex, 'code')}
                                 key={`code_${semesterIndex}_${subjectIndex}`}
                                 required
+                                disabled
                             />
                         </div>
                         <div className='flex flex-col md:flex-row justify-start items-center gap-4 w-full'>
@@ -389,6 +258,7 @@ function Calculator() {
                                     onChange={(e) => handleSubjectChange(e, semesterIndex, subjectIndex, 'credits')}
                                     key={`credits_${semesterIndex}_${subjectIndex}`}
                                     required
+                                    disabled
                                 />
                             </div>
                             <div className='w-full md:w-1/2'>
@@ -414,70 +284,6 @@ function Calculator() {
             </div>
         );
     };
-
-    // const renderElectiveInputs = (semesterIndex) => {
-    //     const electives = electiveData[semesterIndex - 1] || [];
-    //     return (
-    //         <div>
-    //             {electives.map((elective, electiveIndex) => (
-    //                 <div key={`elective-${semesterIndex}-${electiveIndex}`}>
-    //                     <div className='w-full py-4'>
-
-    //                         <h4 className='text-2xl text-orange-600 font-semibold'>ELECTIVE {electiveIndex + 1}</h4>
-    //                     </div>
-    //                     <div className='w-full'>
-    //                         <FloatingLabel
-    //                             variant='filled'
-    //                             label={`Elective Name ${electiveIndex + 1}`}
-    //                             type="text"
-    //                             required
-    //                             value={elective.name}
-    //                             onChange={(e) => handleElectiveSubjectChange(e, semesterIndex, electiveIndex, 'name')}
-    //                         />
-    //                     </div>
-    //                     <div className='w-full'>
-    //                         <FloatingLabel
-    //                             variant='filled'
-    //                             label={`Elective Code ${electiveIndex + 1}`}
-    //                             type="text"
-    //                             required
-    //                             value={elective.code}
-    //                             onChange={(e) => handleElectiveSubjectChange(e, semesterIndex, electiveIndex, 'code')}
-    //                         />
-    //                     </div>
-    //                     <div className='flex flex-col md:flex-row justify-start items-center gap-4 w-full'>
-    //                         <div className="w-full md:w-1/3">
-    //                             <FloatingLabel
-    //                                 variant='filled'
-    //                                 label={`Total Credits ${electiveIndex + 1}`}
-    //                                 type="number"
-    //                                 min='1'
-    //                                 required
-    //                                 value={elective.credits}
-    //                                 onChange={(e) => handleElectiveSubjectChange(e, semesterIndex, electiveIndex, 'credits')}
-    //                             />
-    //                         </div>
-    //                         <div className='w-full md:w-1/2'>
-    //                             <Select
-    //                                 required
-    //                                 value={elective.grade}
-    //                                 onChange={(e) => handleElectiveSubjectChange(e, semesterIndex, electiveIndex, 'grade')}
-    //                             >
-    //                                 <option value="">Select Grade</option>
-    //                                 {Object.keys(gradeScale).map((grade) => (
-    //                                     <option key={grade} value={grade}>
-    //                                         {grade}
-    //                                     </option>
-    //                                 ))}
-    //                             </Select>
-    //                         </div>
-    //                         <Alert color="warning" className='w-full md:auto font-bold'>This will be reflected on your CGPA !</Alert>
-    //                     </div>
-    //                 </div>
-    //             ))}
-    //         </div>
-    //     );
-    // };
 
     useEffect(() => {
         const fetchDepartments = async () => {
@@ -529,8 +335,8 @@ function Calculator() {
     }, [selectedDepartmentAcronym]);
 
     return (
-        <div className="p-4 max-w-3xl mx-auto min-h-screen ">
-            <h1 className="text-2xl text-center pb-6 font-bold">YOUR DETAILS</h1>
+        <div className="p-4 max-w-4xl mx-auto min-h-screen ">
+            <h1 className="text-2xl text-center pb-6 font-bold">ENTER YOUR DETAILS</h1>
             <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
                 <FloatingLabel
                     variant='filled'
@@ -587,7 +393,7 @@ function Calculator() {
                 />
 
                 {renderSemesterInputs()}
-                <Button type='submit' className='bg-violet-500'>Submit</Button>
+                <button type='submit' className='py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700'>Submit</button>
                 <TextInput
                     type="text"
                     readOnly
