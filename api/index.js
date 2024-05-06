@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
 import departmentRoutes from './routes/department.route.js';
+import semesterRoutes from './routes/semester.route.js';
+import verticalRoutes from './routes/vertical.route.js';
 
 dotenv.config();
 
@@ -21,7 +23,8 @@ app.use(express.json());
 
 
 app.use('/api/departments', departmentRoutes);
-
+app.use('/api/semesters', semesterRoutes);
+app.use('/api/verticals', verticalRoutes);
 
 const port = process.env.PORT || 3000;
 

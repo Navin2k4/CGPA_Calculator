@@ -9,12 +9,19 @@ function Calculator() {
     const [cgpa, setCgpa] = useState(null);
     const [numSemesters, setNumSemesters] = useState(0);
     const [showTranscript, setShowTranscript] = useState(false);
-    const [showElectiveFields, setShowElectiveFields] = useState([]);
-    const [numElectives, setNumElectives] = useState([]);
-    const [electiveData, setElectiveData] = useState([]);
+    // const [showElectiveFields, setShowElectiveFields] = useState([]);
+    // const [numElectives, setNumElectives] = useState([]);
+    // const [electiveData, setElectiveData] = useState([]);
 
     const [departments, setDepartments] = useState([]);
-    console.log(studentInfo, formData, electiveData, numSemesters, numElectives, cgpa, departments);
+    const [selectedDepartmentAcronym, setSelectedDepartmentAcronym] = useState('');
+    const [semesters, setSemesters] = useState([]);
+    const [electives, setElectives] = useState([]); // New state for elective courses
+
+    console.log("Semester : ", semesters);
+    console.log("Depts :",departments);
+    console.log("Electives : ",electives);
+
     const handleSubmit = (event) => {
         event.preventDefault();
         let totalCredits = 0;
@@ -36,17 +43,17 @@ function Calculator() {
             });
 
             // Include elective subjects in the calculation
-            electiveData[semesterIndex].forEach((elective) => {
-                const course = `${elective.name} (${elective.code})`;
-                if (selectedCourses.has(course)) {
-                    alert('You cannot select the same course in multiple semesters.');
-                    return;
-                }
-                selectedCourses.add(course);
-                const credits = parseFloat(elective.credits);
-                semesterTotalCredits += credits;
-                semesterTotalMarks += gradeScale[elective.grade] * credits;
-            });
+            // electiveData[semesterIndex].forEach((elective) => {
+            //     const course = `${elective.name} (${elective.code})`;
+            //     if (selectedCourses.has(course)) {
+            //         alert('You cannot select the same course in multiple semesters.');
+            //         return;
+            //     }
+            //     selectedCourses.add(course);
+            //     const credits = parseFloat(elective.credits);
+            //     semesterTotalCredits += credits;
+            //     semesterTotalMarks += gradeScale[elective.grade] * credits;
+            // });
 
             totalCredits += semesterTotalCredits;
             totalMarks += semesterTotalMarks;
@@ -63,37 +70,41 @@ function Calculator() {
             ...prevStudentInfo,
             [name]: capitalizedValue
         }));
+        if (name === 'department') {
+            const acronym = value.split(' - ')[0]; // Extract department acronym from selected value
+            setSelectedDepartmentAcronym(acronym);
+        }
     };
 
     const handleNumSemestersChange = (event) => {
         const newNumSemesters = parseInt(event.target.value);
         setNumSemesters(newNumSemesters);
-        setShowElectiveFields((prevShowElectiveFields) => {
-            const newShowElectiveFields = [...prevShowElectiveFields];
-            for (let i = 0; i < prevShowElectiveFields.length; i++) {
-                if (i >= newNumSemesters) {
-                    break;
-                }
-                newShowElectiveFields[i] = prevShowElectiveFields[i];
-            }
-            for (let i = prevShowElectiveFields.length; i < newNumSemesters; i++) {
-                newShowElectiveFields.push(false);
-            }
-            return newShowElectiveFields;
-        });
-        setNumElectives((prevNumElectives) => {
-            const newNumElectives = [...prevNumElectives];
-            for (let i = 0; i < prevNumElectives.length; i++) {
-                if (i >= newNumSemesters) {
-                    break;
-                }
-                newNumElectives[i] = prevNumElectives[i];
-            }
-            for (let i = prevNumElectives.length; i < newNumSemesters; i++) {
-                newNumElectives.push(0);
-            }
-            return newNumElectives;
-        });
+        // setShowElectiveFields((prevShowElectiveFields) => {
+        //     const newShowElectiveFields = [...prevShowElectiveFields];
+        //     for (let i = 0; i < prevShowElectiveFields.length; i++) {
+        //         if (i >= newNumSemesters) {
+        //             break;
+        //         }
+        //         newShowElectiveFields[i] = prevShowElectiveFields[i];
+        //     }
+        //     for (let i = prevShowElectiveFields.length; i < newNumSemesters; i++) {
+        //         newShowElectiveFields.push(false);
+        //     }
+        //     return newShowElectiveFields;
+        // });
+        // setNumElectives((prevNumElectives) => {
+        //     const newNumElectives = [...prevNumElectives];
+        //     for (let i = 0; i < prevNumElectives.length; i++) {
+        //         if (i >= newNumSemesters) {
+        //             break;
+        //         }
+        //         newNumElectives[i] = prevNumElectives[i];
+        //     }
+        //     for (let i = prevNumElectives.length; i < newNumSemesters; i++) {
+        //         newNumElectives.push(0);
+        //     }
+        //     return newNumElectives;
+        // });
         setFormData((prevFormData) => {
             let newFormData = [...prevFormData];
             if (newNumSemesters < newFormData.length) {
@@ -143,65 +154,65 @@ function Calculator() {
         }
     };
 
-    const handleNumElectivesChange = (event, semesterIndex) => {
-        const { value } = event.target;
-        const numElectives = parseInt(value);
+    // const handleNumElectivesChange = (event, semesterIndex) => {
+    //     const { value } = event.target;
+    //     const numElectives = parseInt(value);
 
-        if (isNaN(numElectives) || numElectives < 0) {
-            // Prevent increasing number of electives beyond 0
-            return;
-        }
+    //     if (isNaN(numElectives) || numElectives < 0) {
+    //         // Prevent increasing number of electives beyond 0
+    //         return;
+    //     }
 
-        setNumElectives((prevNumElectives) => {
-            const newNumElectives = [...prevNumElectives];
-            newNumElectives[semesterIndex - 1] = numElectives;
+    //     setNumElectives((prevNumElectives) => {
+    //         const newNumElectives = [...prevNumElectives];
+    //         newNumElectives[semesterIndex - 1] = numElectives;
 
-            // If number of electives is set to 0, clear elective data
-            if (numElectives === 0) {
-                setElectiveData((prevElectiveData) => {
-                    const newElectiveData = [...prevElectiveData];
-                    newElectiveData[semesterIndex - 1] = [];
-                    return newElectiveData;
-                });
-            } else {
-                // Initialize elective data if not already initialized
-                if (!electiveData[semesterIndex - 1]) {
-                    setElectiveData((prevElectiveData) => {
-                        const newElectiveData = [...prevElectiveData];
-                        newElectiveData[semesterIndex - 1] = new Array(numElectives).fill({
-                            name: '',
-                            code: '',
-                            credits: 0,
-                            grade: ''
-                        });
-                        return newElectiveData;
-                    });
-                } else {
-                    // If elective data already exists, adjust its length
-                    setElectiveData((prevElectiveData) => {
-                        const newElectiveData = [...prevElectiveData];
-                        const existingElectives = newElectiveData[semesterIndex - 1] || [];
-                        const newElectiveArray = new Array(numElectives).fill(null).map((_, index) => {
-                            if (existingElectives[index]) {
-                                return existingElectives[index];
-                            } else {
-                                return {
-                                    name: '',
-                                    code: '',
-                                    credits: 0,
-                                    grade: ''
-                                };
-                            }
-                        });
-                        newElectiveData[semesterIndex - 1] = newElectiveArray;
-                        return newElectiveData;
-                    });
-                }
-            }
+    //         // If number of electives is set to 0, clear elective data
+    //         if (numElectives === 0) {
+    //             setElectiveData((prevElectiveData) => {
+    //                 const newElectiveData = [...prevElectiveData];
+    //                 newElectiveData[semesterIndex - 1] = [];
+    //                 return newElectiveData;
+    //             });
+    //         } else {
+    //             // Initialize elective data if not already initialized
+    //             if (!electiveData[semesterIndex - 1]) {
+    //                 setElectiveData((prevElectiveData) => {
+    //                     const newElectiveData = [...prevElectiveData];
+    //                     newElectiveData[semesterIndex - 1] = new Array(numElectives).fill({
+    //                         name: '',
+    //                         code: '',
+    //                         credits: 0,
+    //                         grade: ''
+    //                     });
+    //                     return newElectiveData;
+    //                 });
+    //             } else {
+    //                 // If elective data already exists, adjust its length
+    //                 setElectiveData((prevElectiveData) => {
+    //                     const newElectiveData = [...prevElectiveData];
+    //                     const existingElectives = newElectiveData[semesterIndex - 1] || [];
+    //                     const newElectiveArray = new Array(numElectives).fill(null).map((_, index) => {
+    //                         if (existingElectives[index]) {
+    //                             return existingElectives[index];
+    //                         } else {
+    //                             return {
+    //                                 name: '',
+    //                                 code: '',
+    //                                 credits: 0,
+    //                                 grade: ''
+    //                             };
+    //                         }
+    //                     });
+    //                     newElectiveData[semesterIndex - 1] = newElectiveArray;
+    //                     return newElectiveData;
+    //                 });
+    //             }
+    //         }
 
-            return newNumElectives;
-        });
-    };
+    //         return newNumElectives;
+    //     });
+    // };
 
 
 
@@ -216,15 +227,15 @@ function Calculator() {
         });
     };
 
-    const handleElectiveSubjectChange = (event, semesterIndex, electiveIndex, key) => {
-        const { value } = event.target;
-        setElectiveData((prevElectiveData) => {
-            const newElectiveData = [...prevElectiveData];
-            const newElective = { ...newElectiveData[semesterIndex - 1][electiveIndex], [key]: value };
-            newElectiveData[semesterIndex - 1][electiveIndex] = newElective;
-            return newElectiveData;
-        });
-    };
+    // const handleElectiveSubjectChange = (event, semesterIndex, electiveIndex, key) => {
+    //     const { value } = event.target;
+    //     setElectiveData((prevElectiveData) => {
+    //         const newElectiveData = [...prevElectiveData];
+    //         const newElective = { ...newElectiveData[semesterIndex - 1][electiveIndex], [key]: value };
+    //         newElectiveData[semesterIndex - 1][electiveIndex] = newElective;
+    //         return newElectiveData;
+    //     });
+    // };
 
     const renderSemesterInputs = () => {
         const inputs = [];
@@ -245,9 +256,7 @@ function Calculator() {
                     </div>
                     {renderSubjectInputs(i)}
 
-                    {/* Only electives are fro 5th semesters for CSE */}
-                    {/* Only render elective fields for semesters greater than 4 */}
-                    <div className="flex items-center gap-2 py-4" >
+                    {/* <div className="flex items-center gap-2 py-4" >
                         <Label htmlFor={`elective-${i}`} className=' font-bold'>Having Elective in Semester {i}</Label>
                         <Radio id={`elective-${i}`} name={`elective-${i}`} value="yes" onChange={() => setShowElectiveFields((prevShowElectiveFields) => prevShowElectiveFields.map((value, index) => index === i - 1 ? true : value))} />
                         <Label>Yes</Label>
@@ -287,7 +296,7 @@ function Calculator() {
                             />
                             {renderElectiveInputs(i, numElectives[i - 1])}
                         </div>
-                    )}
+                    )} */}
                 </div>
             );
         }
@@ -297,6 +306,28 @@ function Calculator() {
 
     const renderSubjectInputs = (semesterIndex) => {
         const subjects = formData[semesterIndex - 1] || [];
+        const semesterData = semesters.find(semester => semester.department_acronym === selectedDepartmentAcronym);
+
+        const selectedCourses = new Set();
+
+        subjects.forEach(subject => {
+            const selectedCourse = `${subject.title} (${subject.code})`;
+            selectedCourses.add(selectedCourse);
+        });
+
+        const handleCourseSelect = (event, subjectIndex) => {
+            const selectedCourse = event.target.value;
+            const selectedCourseDetails = semesterData?.semesters[semesterIndex - 1]?.courses.find(course => {
+                return `${course.course_name} (${course.course_code})` === selectedCourse;
+            });
+
+            if (selectedCourseDetails) {
+                handleSubjectChange({ target: { value: selectedCourseDetails.course_name } }, semesterIndex, subjectIndex, 'title');
+                handleSubjectChange({ target: { value: selectedCourseDetails.course_code } }, semesterIndex, subjectIndex, 'code');
+                handleSubjectChange({ target: { value: selectedCourseDetails.course_credits } }, semesterIndex, subjectIndex, 'credits');
+            }
+        };
+
         return (
             <div>
                 {subjects.map((subject, subjectIndex) => (
@@ -304,7 +335,38 @@ function Calculator() {
                         <div className='w-full py-4'>
                             <h4 className='text-2xl text-violet-600 font-semibold'>SUBJECT {subjectIndex + 1}</h4>
                         </div>
-                        <div className='w-full'>
+                        <div className='w-full py-3'>
+                            <Select
+                                name="courseName"
+                                required
+                                onChange={(e) => handleCourseSelect(e, subjectIndex)}
+                            >
+                                <option value="">Select Course</option>
+                                {(semesterData?.semesters[semesterIndex - 1]?.courses || []).map(course => {
+                                    const courseValue = `${course.course_name} (${course.course_code})`;
+                                    const isCourseSelected = selectedCourses.has(courseValue);
+                                    return (
+                                        <option
+                                            key={course._id}
+                                            value={courseValue}
+                                            disabled={isCourseSelected}
+                                        >
+                                            {isCourseSelected ? course.course_name : `${course.course_code} - ${course.course_name}`}
+                                        </option>
+                                    );
+                                })}
+
+                                {/* Display elective courses */}
+                                {electiveCourses.map(electiveCourse => (
+                                    <option
+                                        key={electiveCourse._id}
+                                        value={`${electiveCourse.elective_name} (${electiveCourse.elective_code})`}
+                                    >
+                                        {`${electiveCourse.elective_code} - ${electiveCourse.elective_name}`}
+                                    </option>
+                                ))}
+                            </Select>
+                        </div><div className='w-full'>
                             <FloatingLabel
                                 variant='filled'
                                 label='Course Code'
@@ -315,17 +377,6 @@ function Calculator() {
                                 required
                             />
                         </div>
-                        <div className='w-full'>
-                            <FloatingLabel
-                                variant='filled'
-                                label='Course Name'
-                                type="text"
-                                value={subject.title}
-                                onChange={(e) => handleSubjectChange(e, semesterIndex, subjectIndex, 'title')}
-                                key={`title_${semesterIndex}_${subjectIndex}`}
-                                required
-                            />
-                        </div>
                         <div className='flex flex-col md:flex-row justify-start items-center gap-4 w-full'>
                             <div className="w-full md:w-1/3">
                                 <FloatingLabel
@@ -333,6 +384,7 @@ function Calculator() {
                                     label='Total Credits'
                                     type="number"
                                     min='1'
+                                    max='4'
                                     value={subject.credits}
                                     onChange={(e) => handleSubjectChange(e, semesterIndex, subjectIndex, 'credits')}
                                     key={`credits_${semesterIndex}_${subjectIndex}`}
@@ -363,69 +415,69 @@ function Calculator() {
         );
     };
 
-    const renderElectiveInputs = (semesterIndex) => {
-        const electives = electiveData[semesterIndex - 1] || [];
-        return (
-            <div>
-                {electives.map((elective, electiveIndex) => (
-                    <div key={`elective-${semesterIndex}-${electiveIndex}`}>
-                        <div className='w-full py-4'>
+    // const renderElectiveInputs = (semesterIndex) => {
+    //     const electives = electiveData[semesterIndex - 1] || [];
+    //     return (
+    //         <div>
+    //             {electives.map((elective, electiveIndex) => (
+    //                 <div key={`elective-${semesterIndex}-${electiveIndex}`}>
+    //                     <div className='w-full py-4'>
 
-                            <h4 className='text-2xl text-orange-600 font-semibold'>ELECTIVE {electiveIndex + 1}</h4>
-                        </div>
-                        <div className='w-full'>
-                            <FloatingLabel
-                                variant='filled'
-                                label={`Elective Name ${electiveIndex + 1}`}
-                                type="text"
-                                required
-                                value={elective.name}
-                                onChange={(e) => handleElectiveSubjectChange(e, semesterIndex, electiveIndex, 'name')}
-                            />
-                        </div>
-                        <div className='w-full'>
-                            <FloatingLabel
-                                variant='filled'
-                                label={`Elective Code ${electiveIndex + 1}`}
-                                type="text"
-                                required
-                                value={elective.code}
-                                onChange={(e) => handleElectiveSubjectChange(e, semesterIndex, electiveIndex, 'code')}
-                            />
-                        </div>
-                        <div className='flex flex-col md:flex-row justify-start items-center gap-4 w-full'>
-                            <div className="w-full md:w-1/3">
-                                <FloatingLabel
-                                    variant='filled'
-                                    label={`Total Credits ${electiveIndex + 1}`}
-                                    type="number"
-                                    min='1'
-                                    required
-                                    value={elective.credits}
-                                    onChange={(e) => handleElectiveSubjectChange(e, semesterIndex, electiveIndex, 'credits')}
-                                />
-                            </div>
-                            <div className='w-full md:w-1/2'>
-                                <Select
-                                    required
-                                    value={elective.grade}
-                                    onChange={(e) => handleElectiveSubjectChange(e, semesterIndex, electiveIndex, 'grade')}
-                                >
-                                    <option value="">Select Grade</option>
-                                    {Object.keys(gradeScale).map((grade) => (
-                                        <option key={grade} value={grade}>
-                                            {grade}
-                                        </option>
-                                    ))}
-                                </Select>
-                            </div>
-                            <Alert color="warning" className='w-full md:auto font-bold'>This will be reflected on your CGPA !</Alert>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        );
-    };
+    //                         <h4 className='text-2xl text-orange-600 font-semibold'>ELECTIVE {electiveIndex + 1}</h4>
+    //                     </div>
+    //                     <div className='w-full'>
+    //                         <FloatingLabel
+    //                             variant='filled'
+    //                             label={`Elective Name ${electiveIndex + 1}`}
+    //                             type="text"
+    //                             required
+    //                             value={elective.name}
+    //                             onChange={(e) => handleElectiveSubjectChange(e, semesterIndex, electiveIndex, 'name')}
+    //                         />
+    //                     </div>
+    //                     <div className='w-full'>
+    //                         <FloatingLabel
+    //                             variant='filled'
+    //                             label={`Elective Code ${electiveIndex + 1}`}
+    //                             type="text"
+    //                             required
+    //                             value={elective.code}
+    //                             onChange={(e) => handleElectiveSubjectChange(e, semesterIndex, electiveIndex, 'code')}
+    //                         />
+    //                     </div>
+    //                     <div className='flex flex-col md:flex-row justify-start items-center gap-4 w-full'>
+    //                         <div className="w-full md:w-1/3">
+    //                             <FloatingLabel
+    //                                 variant='filled'
+    //                                 label={`Total Credits ${electiveIndex + 1}`}
+    //                                 type="number"
+    //                                 min='1'
+    //                                 required
+    //                                 value={elective.credits}
+    //                                 onChange={(e) => handleElectiveSubjectChange(e, semesterIndex, electiveIndex, 'credits')}
+    //                             />
+    //                         </div>
+    //                         <div className='w-full md:w-1/2'>
+    //                             <Select
+    //                                 required
+    //                                 value={elective.grade}
+    //                                 onChange={(e) => handleElectiveSubjectChange(e, semesterIndex, electiveIndex, 'grade')}
+    //                             >
+    //                                 <option value="">Select Grade</option>
+    //                                 {Object.keys(gradeScale).map((grade) => (
+    //                                     <option key={grade} value={grade}>
+    //                                         {grade}
+    //                                     </option>
+    //                                 ))}
+    //                             </Select>
+    //                         </div>
+    //                         <Alert color="warning" className='w-full md:auto font-bold'>This will be reflected on your CGPA !</Alert>
+    //                     </div>
+    //                 </div>
+    //             ))}
+    //         </div>
+    //     );
+    // };
 
     useEffect(() => {
         const fetchDepartments = async () => {
@@ -442,7 +494,39 @@ function Calculator() {
         fetchDepartments();
     }, []);
 
+    useEffect(() => {
+        const fetchSemesters = async () => {
+            try {
+                const res = await fetch(`/api/semesters/getsemesters?department_acronym=${selectedDepartmentAcronym}`);
+                const data = await res.json();
+                if (res.ok) {
+                    setSemesters(data);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        if (selectedDepartmentAcronym) {
+            fetchSemesters();
+        }
+    }, [selectedDepartmentAcronym]);
 
+    useEffect(() => {
+        const fetchVerticals = async () => {
+            try {
+                const res = await fetch(`/api/verticals/getverticals?department_acronym=${selectedDepartmentAcronym}`);
+                const data = await res.json();
+                if (res.ok) {
+                    setElectives(data);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        if (selectedDepartmentAcronym) {
+            fetchVerticals();
+        }
+    }, [selectedDepartmentAcronym]);
 
     return (
         <div className="p-4 max-w-3xl mx-auto min-h-screen ">
@@ -504,19 +588,12 @@ function Calculator() {
 
                 {renderSemesterInputs()}
                 <Button type='submit' className='bg-violet-500'>Submit</Button>
+                <TextInput
+                    type="text"
+                    readOnly
+                    value={cgpa !== null ? `CGPA: ${cgpa.toFixed(2)}` : 'Your CGPA Appears here'}
+                />
             </form>
-            <section className='flex flex-col gap-3'>
-                <Alert className='font-bold items-center'>TODO: To Add for any additional courses made during the academic year and other details </Alert>
-                <Alert className='font-bold items-center'>TODO: To display the subjects seperately which are "U"</Alert>
-                <Alert className='font-bold items-center'>TODO: Connect To MONGODB and fetch the details based on the department selected</Alert>
-                <Alert className='font-bold items-center'>TODO: Make a POP up window to display the Transcript Not on the page itself</Alert>
-                <Alert className='font-bold items-center'>TODO: Option to view the pdf before downloading or show a previwe of that pdf</Alert>
-            </section>
-            <TextInput
-                type="text"
-                readOnly
-                value={cgpa !== null ? `CGPA: ${cgpa.toFixed(2)}` : 'Your CGPA Appears here'}
-            />
 
             {showTranscript && (
                 <Transcript
@@ -524,8 +601,7 @@ function Calculator() {
                     numSemesters={numSemesters}
                     semesterData={formData}
                     cgpa={cgpa}
-                    electiveData={electiveData}
-
+                // electiveData={electiveData}
                 />
             )}
 
