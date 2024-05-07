@@ -54,7 +54,7 @@ function Calculator() {
             [name]: capitalizedValue
         }));
         if (name === 'department') {
-            const acronym = value.split(' - ')[0]; 
+            const acronym = value.split(' - ')[0];
             setSelectedDepartmentAcronym(acronym);
         }
     };
@@ -141,12 +141,12 @@ function Calculator() {
                         />
                     </div>
                     {renderSubjectInputs(i)}
-
                 </div>
             );
         }
         return inputs;
     };
+
 
 
     const renderSubjectInputs = (semesterIndex) => {
@@ -187,7 +187,7 @@ function Calculator() {
         return (
             <div>
                 {subjects.map((subject, subjectIndex) => (
-                    <div className='flex flex-wrap w-full' key={subjectIndex}>
+                    <div className='flex flex-col flex-wrap w-full' key={subjectIndex}>
                         <div className='w-full py-4'>
                             <h4 className='text-2xl text-violet-600 font-semibold'>SUBJECT {subjectIndex + 1}</h4>
                         </div>
@@ -336,7 +336,7 @@ function Calculator() {
 
     return (
         <div className="p-4 max-w-4xl mx-auto min-h-screen ">
-            <h1 className="text-2xl text-center pb-6 font-bold">ENTER YOUR DETAILS</h1>
+            <h1 className="text-2xl text-center pb-6">ENTER YOUR DETAILS</h1>
             <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
                 <FloatingLabel
                     variant='filled'
@@ -407,7 +407,6 @@ function Calculator() {
                     numSemesters={numSemesters}
                     semesterData={formData}
                     cgpa={cgpa}
-                // electiveData={electiveData}
                 />
             )}
 

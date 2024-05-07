@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 html {
-    background-color: rgb(237, 237, 237);
+    background-color: rgb(226, 232, 240);
 }
 
 input[type=number]::-webkit-inner-spin-button,
