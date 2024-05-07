@@ -1,5 +1,6 @@
 import React from 'react';
 import html2pdf from 'html2pdf.js';
+import { Table } from 'flowbite-react';
 
 function Transcript({ studentInfo, numSemesters, semesterData, cgpa }) {
     const handleDownloadPDF = () => {
@@ -33,7 +34,7 @@ function Transcript({ studentInfo, numSemesters, semesterData, cgpa }) {
                                     <span className="text-gray-500 text-[18px] ">{semesterIndex % 2 !== 0 ? " EVEN" : " ODD"} Semester</span></h3>
                             </div>
                             <div className="px-6 py-4">
-                                <table className="w-full table-fixed">
+                                <Table className="w-full">
                                     <thead className=''>
                                         <tr className="text-left font-semibold border-b border-gray-200">
                                             <th className="w-2/5 lg:w-3/5 py-2">Course Title</th>
@@ -42,23 +43,23 @@ function Transcript({ studentInfo, numSemesters, semesterData, cgpa }) {
                                             <th className="w-1/5 lg:w-1/5 py-2">Grade</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody> {/* Add tbody here */}
                                         {subjects.map((subject, subjectIndex) => (
                                             <tr key={subjectIndex} className="border-b border-gray-200">
-                                                <td className="py-3">{subject.title}</td>
-                                                <td className="py-3">{subject.code}</td>
-                                                <td className="py-3">{subject.credits}</td>
-                                                <td className="py-3">{subject.grade}</td>
+                                                <td className="py-3 font-semibold">{subject.title}</td>
+                                                <td className="py-3 font-semibold">{subject.code}</td>
+                                                <td className="py-3 font-semibold">{subject.credits}</td>
+                                                <td className="py-3 font-semibold">{subject.grade}</td>
                                             </tr>
                                         ))}
                                     </tbody>
-                                </table>
+                                </Table>
                             </div>
                         </div>
                     ))}
                 </div>
                 <div className="text-left mt-8">
-                    <h3 className="text-2xl font-semibold mb-10">{cgpa !== null ? `Overall CGPA : ${cgpa.toFixed(2)}` : ''}</h3>
+                    <h3 className="text-2xl font-semibold ">{cgpa !== null ? `Overall CGPA : ${cgpa.toFixed(2)}` : ''}</h3>
                 </div>
             </div>
         );
@@ -67,7 +68,7 @@ function Transcript({ studentInfo, numSemesters, semesterData, cgpa }) {
 
     return (
         <>
-            <div id="transcript-container" className="font-sans text-base leading-normal py-4">
+            <div id="transcript-container" className="font-sans text-base leading-normal">
                 <div className="container mx-auto">
                     <div className="flex flex-col lg:flex-row justify-around items-center py-6">
                         <div>
@@ -111,7 +112,7 @@ function Transcript({ studentInfo, numSemesters, semesterData, cgpa }) {
                     </div>
                 </div>
             </div>
-            <div>
+            <div className='items-center text-center'>
                 <button onClick={handleDownloadPDF} className="py-3 px-6 bg-blue-600 text-white rounded-lg hover:bg-blue-700">DOWNLOAD AS PDF</button>
             </div>
         </>

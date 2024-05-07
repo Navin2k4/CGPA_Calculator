@@ -15,9 +15,55 @@ function Calculator() {
     const [semesters, setSemesters] = useState([]);
     const [electives, setElectives] = useState([]);
 
-    console.log("Semester : ", semesters);
-    console.log("Depts :", departments);
-    console.log("Electives : ", electives);
+    useEffect(() => {
+        const fetchDepartments = async () => {
+            try {
+                const res = await fetch(`/api/departments/getdepartments`);
+                const data = await res.json();
+                if (res.ok) {
+                    setDepartments(data);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        fetchDepartments();
+    }, []);
+
+    useEffect(() => {
+        const fetchSemesters = async () => {
+            try {
+                const res = await fetch(`/api/semesters/getsemesters?department_acronym=${selectedDepartmentAcronym}`);
+                const data = await res.json();
+                if (res.ok) {
+                    setSemesters(data);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        if (selectedDepartmentAcronym) {
+            fetchSemesters();
+        }
+    }, [selectedDepartmentAcronym]);
+
+    useEffect(() => {
+        const fetchVerticals = async () => {
+            try {
+                const res = await fetch(`/api/verticals/getverticals?department_acronym=${selectedDepartmentAcronym}`);
+                const data = await res.json();
+                if (res.ok) {
+                    setElectives(data);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        if (selectedDepartmentAcronym) {
+            fetchVerticals();
+        }
+    }, [selectedDepartmentAcronym]);
+
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -47,6 +93,7 @@ function Calculator() {
     };
 
     const handleStudentInfoChange = (event) => {
+        setShowTranscript(false);
         const { name, value } = event.target;
         const capitalizedValue = (name !== 'department' && name !== 'numSemesters') ? value.toUpperCase() : value;
         setStudentInfo((prevStudentInfo) => ({
@@ -60,6 +107,7 @@ function Calculator() {
     };
 
     const handleNumSemestersChange = (event) => {
+        setShowTranscript(false);
         const newNumSemesters = parseInt(event.target.value);
         setNumSemesters(newNumSemesters);
         setFormData((prevFormData) => {
@@ -75,6 +123,7 @@ function Calculator() {
     };
 
     const handleNumSubjectsChange = (event, semesterIndex) => {
+        setShowTranscript(false);
         const { value } = event.target;
         const numSubjects = parseInt(value);
 
@@ -113,6 +162,8 @@ function Calculator() {
 
 
     const handleSubjectChange = (event, semesterIndex, subjectIndex, key) => {
+        setShowTranscript(false);
+
         const { value } = event.target;
         setFormData((prevFormData) => {
             const newFormData = [...prevFormData];
@@ -127,8 +178,8 @@ function Calculator() {
         const inputs = [];
         for (let i = 1; i <= numSemesters; i++) {
             inputs.push(
-                <div className={`w-full`} key={i}>
-                    <h3 className='text-black font-bold text-2xl text-center py-6'>SEMESTER {i} {i % 2 === 0 ? "EVEN" : "ODD"}</h3>
+                <div className='w-full  border-t-4 border-gray-500 my-4' key={i}>
+                    <h3 className='text-black  font-sans text-2xl text-center py-6 tracking-wider'>SEMESTER {i} {i % 2 === 0 ? "EVEN" : "ODD"}</h3>
                     <div>
                         <FloatingLabel
                             variant='filled'
@@ -189,7 +240,7 @@ function Calculator() {
                 {subjects.map((subject, subjectIndex) => (
                     <div className='flex flex-col flex-wrap w-full' key={subjectIndex}>
                         <div className='w-full py-4'>
-                            <h4 className='text-2xl text-violet-600 font-semibold'>SUBJECT {subjectIndex + 1}</h4>
+                            <h4 className='text-2xl text-teal-800 tracking-wider font-semibold'>SUBJECT {subjectIndex + 1}</h4>
                         </div>
                         <div className='w-full py-3'>
                             <Select
@@ -277,7 +328,7 @@ function Calculator() {
                                     ))}
                                 </Select>
                             </div>
-                            <Alert color="warning" className='w-full md:auto font-bold'>This will be reflected on your CGPA !</Alert>
+                            <Alert color="grey" rounded className='w-full md:auto font-bold border border-black items-center'>This will be reflected on your CGPA !</Alert>
                         </div>
                     </div>
                 ))}
@@ -285,54 +336,6 @@ function Calculator() {
         );
     };
 
-    useEffect(() => {
-        const fetchDepartments = async () => {
-            try {
-                const res = await fetch(`/api/departments/getdepartments`);
-                const data = await res.json();
-                if (res.ok) {
-                    setDepartments(data);
-                }
-            } catch (error) {
-                console.log(error);
-            }
-        }
-        fetchDepartments();
-    }, []);
-
-    useEffect(() => {
-        const fetchSemesters = async () => {
-            try {
-                const res = await fetch(`/api/semesters/getsemesters?department_acronym=${selectedDepartmentAcronym}`);
-                const data = await res.json();
-                if (res.ok) {
-                    setSemesters(data);
-                }
-            } catch (error) {
-                console.log(error);
-            }
-        };
-        if (selectedDepartmentAcronym) {
-            fetchSemesters();
-        }
-    }, [selectedDepartmentAcronym]);
-
-    useEffect(() => {
-        const fetchVerticals = async () => {
-            try {
-                const res = await fetch(`/api/verticals/getverticals?department_acronym=${selectedDepartmentAcronym}`);
-                const data = await res.json();
-                if (res.ok) {
-                    setElectives(data);
-                }
-            } catch (error) {
-                console.log(error);
-            }
-        };
-        if (selectedDepartmentAcronym) {
-            fetchVerticals();
-        }
-    }, [selectedDepartmentAcronym]);
 
     return (
         <div className="p-4 max-w-4xl mx-auto min-h-screen ">
