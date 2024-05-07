@@ -19,7 +19,7 @@ const Header = () => {
                     </DropdownItem>
                 ))}
             </Dropdown>
-        </Navbar >
+        </Navbar>
     );
 };
 
