@@ -6,6 +6,8 @@ import departmentRoutes from './routes/department.route.js';
 import semesterRoutes from './routes/semester.route.js';
 import verticalRoutes from './routes/vertical.route.js';
 
+import path from 'path';
+
 dotenv.config();
 
 mongoose
@@ -17,6 +19,8 @@ mongoose
         console.log(err);
     });
 
+const __dirname = path.resolve();
+
 const app = express();
 
 app.use(express.json());
@@ -25,6 +29,12 @@ app.use(express.json());
 app.use('/api/departments', departmentRoutes);
 app.use('/api/semesters', semesterRoutes);
 app.use('/api/verticals', verticalRoutes);
+
+app.use(express.static(path.join(__dirname, '/client/dist')));
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+});
 
 const port = process.env.PORT || 3000;
 
@@ -39,5 +49,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
+    console.log(`App listening on port ${port}`)
 })
