@@ -7,7 +7,7 @@ const Header = () => {
     return (
         <Navbar className=" bg-slate-200 ring-2 ring-slate-300 ">
             <img className='w-16 h-16 rounded-full' src='vcet.jpeg' />
-            <h1 className='text-2xl font-bold font-mono'>CGPA CALCULATOR</h1>
+            <h1 className='text-2xl font-semibold'>CGPA Calculator</h1>
             <Dropdown inline label="Grades">
                 {Object.keys(gradeScale).map((grade) => (
                     <DropdownItem key={grade}>

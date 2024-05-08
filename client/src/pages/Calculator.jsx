@@ -8,6 +8,7 @@ function Calculator() {
     const [formData, setFormData] = useState([]);
     const [cgpa, setCgpa] = useState(null);
     const [numSemesters, setNumSemesters] = useState(0);
+    console.log(numSemesters);
     const [showTranscript, setShowTranscript] = useState(false);
 
     const [departments, setDepartments] = useState([]);
@@ -120,6 +121,7 @@ function Calculator() {
             }
             return newFormData;
         });
+        setNumSemesters(newNumSemesters);
     };
 
     const handleNumSubjectsChange = (event, semesterIndex) => {
@@ -178,21 +180,23 @@ function Calculator() {
         const inputs = [];
         for (let i = 1; i <= numSemesters; i++) {
             inputs.push(
-                <div className='w-full  border-t-4 border-gray-500 my-4' key={i}>
-                    <h3 className='text-black  font-sans text-2xl text-center py-6 tracking-wider'>SEMESTER {i} {i % 2 === 0 ? "EVEN" : "ODD"}</h3>
-                    <div>
+                <div className="w-full bg-white rounded-lg shadow-lg p-6 mb-8" key={i}>
+                    <h3 className="text-2xl font-semibold text-center text-gray-800 mb-4">SEMESTER {i} {i % 2 === 0 ? "EVEN" : "ODD"}</h3>
+                    <div className="mb-4">
                         <FloatingLabel
-                            variant='filled'
+                            variant="filled"
                             type="number"
-                            label='Number of Subjects'
-                            min='1'
-                            max='20'
-                            value={(formData[i - 1] && formData[i - 1].length) || ''}
+                            label="Number of Subjects"
+                            min="1"
+                            max="20"
+                            value={(formData[i - 1] && formData[i - 1].length) || ""}
                             onChange={(e) => handleNumSubjectsChange(e, i)}
+                            required
                         />
                     </div>
                     {renderSubjectInputs(i)}
                 </div>
+
             );
         }
         return inputs;
@@ -336,84 +340,104 @@ function Calculator() {
         );
     };
 
+    const incrementNumSemesters = () => {
+        const updatedNumSemesters = numSemesters + 1;
+        handleNumSemestersChange({ target: { value: updatedNumSemesters } });
+    };
+
+    const decrementNumSemesters = () => {
+        if (numSemesters > 0) {
+            const updatedNumSemesters = numSemesters - 1;
+            handleNumSemestersChange({ target: { value: updatedNumSemesters } });
+        }
+    };
+
+
 
     return (
-        <div className="p-4 max-w-4xl mx-auto min-h-screen ">
-            <h1 className="text-2xl text-center pb-6">ENTER YOUR DETAILS</h1>
-            <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
-                <FloatingLabel
-                    variant='filled'
-                    type="text"
-                    label='Student Name'
-                    value={studentInfo.name}
-                    onChange={handleStudentInfoChange}
-                    name="name"
-                    helperText="Example : Adam K"
-                    required
-                />
-                <FloatingLabel
-                    variant='filled'
-                    type="text"
-                    label='Roll Number'
-                    value={studentInfo.rollNumber}
-                    onChange={handleStudentInfoChange}
-                    name="rollNumber"
-                    helperText="Example : 22CSEB01"
-                    required
-                />
-                <FloatingLabel
-                    variant='filled'
-                    type="number"
-                    label='Register Number'
-                    value={studentInfo.registerNumber}
-                    onChange={handleStudentInfoChange}
-                    name="registerNumber"
-                    helperText="Example : 913122101100"
-                    required
-                />
-                <Select
-                    value={studentInfo.department}
-                    onChange={handleStudentInfoChange}
-                    name="department"
-                    required
-                >
-                    <option value="">Select Department</option>
-                    {departments.map(department => (
-                        <option key={department._id} value={`${department.department_acronym} - ${department.department_name}`}>
-                            {`${department.department_name} (${department.department_acronym})`}
-                        </option>
-                    ))}
-                </Select>
-                <FloatingLabel
-                    variant='filled'
-                    label='Number Of Semesters'
-                    max='8'
-                    min='0'
-                    type="number"
-                    value={numSemesters}
-                    onChange={handleNumSemestersChange}
-                    required
-                />
+        <>
+            <div className="p-6 max-w-3xl mx-auto m-7 bg-white rounded-lg shadow-md">
+                <h1 className="text-3xl font-semibold text-center text-gray-800 mb-6">Enter Your Details</h1>
+                <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+                    <FloatingLabel
+                        variant="filled"
+                        type="text"
+                        label="Student Name"
+                        value={studentInfo.name}
+                        onChange={handleStudentInfoChange}
+                        name="name"
+                        required
+                    />
+                    <FloatingLabel
+                        variant="filled"
+                        type="text"
+                        label="Roll Number"
+                        value={studentInfo.rollNumber}
+                        onChange={handleStudentInfoChange}
+                        name="rollNumber"
+                        required
+                    />
+                    <FloatingLabel
+                        variant="filled"
+                        type="number"
+                        label="Register Number"
+                        value={studentInfo.registerNumber}
+                        onChange={handleStudentInfoChange}
+                        name="registerNumber"
+                        required
+                    />
+                    <Select
+                        value={studentInfo.department}
+                        onChange={handleStudentInfoChange}
+                        name="department"
+                        required
+                    >
+                        <option value="">Select Department</option>
+                        {departments.map((department) => (
+                            <option key={department._id} value={`${department.department_acronym} - ${department.department_name}`}>
+                                {`${department.department_name} (${department.department_acronym})`}
+                            </option>
+                        ))}
+                    </Select>
 
-                {renderSemesterInputs()}
-                <button type='submit' className='py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700'>Submit</button>
-                <TextInput
-                    type="text"
-                    readOnly
-                    value={cgpa !== null ? `CGPA: ${cgpa.toFixed(2)}` : 'Your CGPA Appears here'}
-                />
-            </form>
+                    <div className='flex flex-col lg:flex-row items-center gap-4'>
+                        <Alert color='blue' className='w-full lg:w-1/3 text-center items-center '>
+                            Select number of semesters
+                        </Alert>                        <div className='flex flex-row items-center gap-4'>
+                            <button type='button' className=' px-4 py-2 bg-blue-200 items-center text-black font-bold hover:bg-blue-400 rounded-lg' onClick={decrementNumSemesters}>-</button>
+                            <div className='w-full lg:w-1/2'>
+                                <FloatingLabel
+                                    className='text-center'
+                                    variant='filled'
+                                    label=''
+                                    max='8'
+                                    min='0'
+                                    type='number'
+                                    value={numSemesters === 0 ? '' : numSemesters}
+                                    onChange={handleNumSemestersChange}
+                                    required
+                                />
+                            </div>
+                            <button type='button' className='px-4 py-2 bg-blue-200 text-black hover:bg-blue-400 rounded-lg' onClick={incrementNumSemesters}>+</button>
+                        </div>
+                    </div>
 
-            {showTranscript && (
-                <Transcript
-                    studentInfo={studentInfo}
-                    numSemesters={numSemesters}
-                    semesterData={formData}
-                    cgpa={cgpa}
-                />
-            )}
 
-        </div>
+                    {renderSemesterInputs()}
+                    <button type="submit" className="bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition duration-300 ease-in-out">
+                        Submit
+                    </button>
+                    <TextInput
+                        type="text"
+                        readOnly
+                        value={cgpa !== null ? `CGPA: ${cgpa.toFixed(2)}` : 'Your CGPA Appears here'}
+                    />
+                </form>
+            </div>
+            {showTranscript && <Transcript
+                studentInfo={studentInfo} numSemesters={numSemesters} semesterData={formData} cgpa={cgpa} />
+            }
+        </>
     );
 }
 

@@ -68,19 +68,20 @@ function Transcript({ studentInfo, numSemesters, semesterData, cgpa }) {
 
     return (
         <>
-            <div id="transcript-container" className="font-sans text-base leading-normal">
+            <div id="transcript-container" className=" max-w-4xl mx-auto font-sans text-base leading-normal">
                 <div className="container mx-auto">
-                    <div className="flex flex-col lg:flex-row justify-around items-center py-6">
+                    <div className="flex flex-col lg:flex-row justify-evenly items-center p-4 gap-4">
                         <div>
-                            <img className="w-32 h-32 my-3 rounded-md" src="vcet.jpeg" alt="VCET Logo" />
+                            <img className="w-32 h-32 rounded-md" src="vcet.jpeg" alt="VCET Logo" />
                         </div>
-                        <div className="text-center items-center px-2">
-                            <h1 className="text-2xl font-bold">Velammal College of Engineering and Technology (Autonomous)</h1>
+                        <div className="text-center">
+                            <h1 className="text-2xl font-bold">Velammal College of Engineering and Technology</h1>
+                            <h2 className='text-lg'>(Autonomous)</h2>
                             <p className="text-lg">Madurai – 625 009</p>
                         </div>
-                        <div></div>
                     </div>
-                    <div className="mb-8">
+
+                    <div className="mb-8 p-4">
                         <h2 className="text-2xl font-bold text-center mb-6">Student Detail</h2>
                         <div className="mb-6">
                             <table className="mx-auto bg-white shadow-md rounded-lg overflow-hidden">
@@ -113,7 +114,7 @@ function Transcript({ studentInfo, numSemesters, semesterData, cgpa }) {
                 </div>
             </div>
             <div className='items-center text-center'>
-                <button onClick={handleDownloadPDF} className="py-3 px-6 bg-blue-600 text-white rounded-lg hover:bg-blue-700">DOWNLOAD AS PDF</button>
+                <button onClick={handleDownloadPDF} className="mb-8 py-3 px-6 bg-blue-600 text-white rounded-lg hover:bg-blue-700">DOWNLOAD AS PDF</button>
             </div>
         </>
     );
