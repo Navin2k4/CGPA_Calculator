@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Transcript from '../components/Transcript';
-import { Select, TextInput, Button, FloatingLabel, Alert, Label, Radio } from 'flowbite-react';
+import { Select, TextInput, FloatingLabel, Alert, Label } from 'flowbite-react';
 
 function Calculator() {
     const gradeScale = { 'O': 10, 'A+': 9, 'A': 8, 'B+': 7, 'B': 6, 'C': 5, 'U': 0 };
@@ -8,7 +8,6 @@ function Calculator() {
     const [formData, setFormData] = useState([]);
     const [cgpa, setCgpa] = useState(null);
     const [numSemesters, setNumSemesters] = useState(0);
-    console.log(numSemesters);
     const [showTranscript, setShowTranscript] = useState(false);
 
     const [departments, setDepartments] = useState([]);
@@ -176,27 +175,51 @@ function Calculator() {
         });
     };
 
+    const incrementNumSubjects = (semesterIndex) => {
+        const updatedNumSubjects = formData[semesterIndex - 1].length + 1;
+        handleNumSubjectsChange({ target: { value: updatedNumSubjects } }, semesterIndex);
+    };
+
+    const decrementNumSubjects = (semesterIndex) => {
+        if (formData[semesterIndex - 1].length > 0) {
+            const updatedNumSubjects = formData[semesterIndex - 1].length - 1;
+            handleNumSubjectsChange({ target: { value: updatedNumSubjects } }, semesterIndex);
+        }
+    };
+
     const renderSemesterInputs = () => {
         const inputs = [];
         for (let i = 1; i <= numSemesters; i++) {
             inputs.push(
-                <div className="w-full bg-white rounded-lg shadow-lg p-6 mb-8" key={i}>
-                    <h3 className="text-2xl font-semibold text-center text-gray-800 mb-4">SEMESTER {i} {i % 2 === 0 ? "EVEN" : "ODD"}</h3>
-                    <div className="mb-4">
-                        <FloatingLabel
-                            variant="filled"
-                            type="number"
-                            label="Number of Subjects"
-                            min="1"
-                            max="20"
-                            value={(formData[i - 1] && formData[i - 1].length) || ""}
-                            onChange={(e) => handleNumSubjectsChange(e, i)}
-                            required
-                        />
+                <div className="w-full bg-white rounded-lg shadow-lg p-3 lg:p-6 mb-8" key={i}>
+                    <h3 className="text-xl md:text-2xl font-semibold text-center text-gray-800 mb-4">SEMESTER {i} {i % 2 === 0 ? "EVEN" : "ODD"}</h3>
+
+                    <div className='flex flex-row items-center '>
+                        <Label color='blue' className='text-sm pr-4 md:text-lg'>
+                            NUMBER OF SUBJECTS
+                        </Label>
+                        <div className='flex flex-row items-center gap-4'>
+                            <button type='button' className='px-4 py-2 bg-blue-200 text-black font-bold hover:bg-blue-400 rounded-lg' onClick={() => decrementNumSubjects(i)}>-</button>
+                            <div className='items-center'>
+                                <FloatingLabel
+                                    className='text-center items-center w-16'
+
+                                    variant="standard"
+                                    type="number"
+                                    min="1"
+                                    max="20"
+                                    value={(formData[i - 1] && formData[i - 1].length) || ""}
+                                    onChange={(e) => handleNumSubjectsChange(e, i)}
+                                    required
+                                    disabled
+                                />
+                            </div>
+                            <button type='button' className='px-4 py-2 bg-blue-200 text-black font-bold hover:bg-blue-400 rounded-lg' onClick={() => incrementNumSubjects(i)}>+</button>
+                        </div>
+
                     </div>
                     {renderSubjectInputs(i)}
                 </div>
-
             );
         }
         return inputs;
@@ -289,42 +312,43 @@ function Calculator() {
 
                             </Select>
                         </div>
-                        <div className='w-full'>
-                            <FloatingLabel
-                                variant='filled'
-                                label='Course Code'
-                                type="text"
-                                value={subject.code}
-                                onChange={(e) => handleSubjectChange(e, semesterIndex, subjectIndex, 'code')}
-                                key={`code_${semesterIndex}_${subjectIndex}`}
-                                required
-                                disabled
-                            />
-                        </div>
-                        <div className='flex flex-col md:flex-row justify-start items-center gap-4 w-full'>
-                            <div className="w-full md:w-1/3">
+
+                        <div className='flex flex-row items-center gap-2'>
+                            <div className='w-1/3'>
                                 <FloatingLabel
                                     variant='filled'
-                                    label='Total Credits'
+                                    label='Course Code'
+                                    type="text"
+                                    value={subject.code}
+                                    onChange={(e) => handleSubjectChange(e, semesterIndex, subjectIndex, 'code')}
+                                    key={`code_${semesterIndex}_${subjectIndex}`}
+                                    required
+                                    disabled
+                                />
+                            </div>
+                            <div className='w-1/3'>
+                                <FloatingLabel
+                                    variant='filled'
+                                    label='Credits'
                                     type="number"
                                     min='1'
                                     max='4'
-                                    value={subject.credits}
+                                    value={subject.credits === 0 ? '' : subject.credits}
                                     onChange={(e) => handleSubjectChange(e, semesterIndex, subjectIndex, 'credits')}
                                     key={`credits_${semesterIndex}_${subjectIndex}`}
                                     required
                                     disabled
                                 />
                             </div>
-                            <div className='w-full md:w-1/2'>
+                            <div className='w-1/3'>
                                 <Select
                                     value={subject.grade}
                                     onChange={(e) => handleSubjectChange(e, semesterIndex, subjectIndex, 'grade')}
                                     key={`grade_${semesterIndex}_${subjectIndex}`}
                                     required
-                                    className='w-full md:w-auto md:ml-4'
+                                    className=''
                                 >
-                                    <option value="">Select Grade</option>
+                                    <option value="">Grade</option>
                                     {Object.keys(gradeScale).map((grade) => (
                                         <option key={grade} value={grade}>
                                             {grade}
@@ -332,13 +356,16 @@ function Calculator() {
                                     ))}
                                 </Select>
                             </div>
-                            <Alert color="grey" rounded className='w-full md:auto font-bold border border-black items-center'>This will be reflected on your CGPA !</Alert>
                         </div>
+
+
                     </div>
+
                 ))}
             </div>
         );
     };
+
 
     const incrementNumSemesters = () => {
         const updatedNumSemesters = numSemesters + 1;
@@ -355,14 +382,15 @@ function Calculator() {
 
 
     return (
-        <>
-            <div className="p-6 max-w-3xl mx-auto m-7 bg-white rounded-lg shadow-md">
-                <h1 className="text-3xl font-semibold text-center text-gray-800 mb-6">Enter Your Details</h1>
-                <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+        <div className='mb-20'>
+            <div className="p-3 md:p-6 max-w-3xl mx-auto md:my-7 bg-white md:rounded-lg shadow-md">
+                <h1 className="text-xl md:text-3xl font-semibold text-center text-gray-800 mb-6  ">Enter Your Details</h1>
+                <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
                     <FloatingLabel
+
                         variant="filled"
                         type="text"
-                        label="Student Name"
+                        label="Student Name ( Eg : ADAM K ) "
                         value={studentInfo.name}
                         onChange={handleStudentInfoChange}
                         name="name"
@@ -371,7 +399,7 @@ function Calculator() {
                     <FloatingLabel
                         variant="filled"
                         type="text"
-                        label="Roll Number"
+                        label="Roll Number ( Eg : 22CSEB01)"
                         value={studentInfo.rollNumber}
                         onChange={handleStudentInfoChange}
                         name="rollNumber"
@@ -380,7 +408,7 @@ function Calculator() {
                     <FloatingLabel
                         variant="filled"
                         type="number"
-                        label="Register Number"
+                        label="Register Number ( Eg : 91322104100 ) "
                         value={studentInfo.registerNumber}
                         onChange={handleStudentInfoChange}
                         name="registerNumber"
@@ -400,20 +428,21 @@ function Calculator() {
                         ))}
                     </Select>
 
-                    <div className='flex flex-col lg:flex-row items-center gap-4'>
+                    <div className='flex flex-col lg:flex-row items-center gap-3 py-2'>
                         <Alert color='blue' className='w-full lg:w-1/3 text-center items-center '>
                             Select number of semesters
-                        </Alert>                        <div className='flex flex-row items-center gap-4'>
+                        </Alert>
+                        <div className='flex flex-row items-center gap-4'>
                             <button type='button' className=' px-4 py-2 bg-blue-200 items-center text-black font-bold hover:bg-blue-400 rounded-lg' onClick={decrementNumSemesters}>-</button>
-                            <div className='w-full lg:w-1/2'>
+                            <div className='w-20 sm:w-40 items-center '>
                                 <FloatingLabel
-                                    className='text-center'
-                                    variant='filled'
+                                    className='text-center  items-center'
+                                    variant='standard'
                                     label=''
                                     max='8'
                                     min='0'
                                     type='number'
-                                    value={numSemesters === 0 ? '' : numSemesters}
+                                    value={numSemesters === 0 ? '0' : numSemesters}
                                     onChange={handleNumSemestersChange}
                                     required
                                 />
@@ -428,6 +457,7 @@ function Calculator() {
                         Submit
                     </button>
                     <TextInput
+                        className='my-4'
                         type="text"
                         readOnly
                         value={cgpa !== null ? `CGPA: ${cgpa.toFixed(2)}` : 'Your CGPA Appears here'}
@@ -437,7 +467,7 @@ function Calculator() {
             {showTranscript && <Transcript
                 studentInfo={studentInfo} numSemesters={numSemesters} semesterData={formData} cgpa={cgpa} />
             }
-        </>
+        </div>
     );
 }
 

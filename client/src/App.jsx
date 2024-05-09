@@ -3,6 +3,7 @@ import React from 'react'
 import Calculator from './pages/Calculator'
 import Header from './components/Header'
 import FooterComp from './components/FooterComp';
+import IssueForm from './components/IssueForm';
 
 const App = () => {
   return (
@@ -11,6 +12,7 @@ const App = () => {
       <Routes>
         <Route path='/' element={<Calculator />} />
       </Routes>
+      <IssueForm />
       <FooterComp />
     </BrowserRouter>
   )

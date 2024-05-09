@@ -58,8 +58,8 @@ function Transcript({ studentInfo, numSemesters, semesterData, cgpa }) {
                         </div>
                     ))}
                 </div>
-                <div className="text-left mt-8">
-                    <h3 className="text-2xl font-semibold ">{cgpa !== null ? `Overall CGPA : ${cgpa.toFixed(2)}` : ''}</h3>
+                <div className="text-center mt-8">
+                    <h3 className="text-2xl font-normal ">{cgpa !== null ? `OVERALL CGPA : ${cgpa.toFixed(2)}` : ''}</h3>
                 </div>
             </div>
         );
