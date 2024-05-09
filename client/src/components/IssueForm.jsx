@@ -1,40 +1,44 @@
-import React from 'react'
-import { useState } from 'react'
-import emailjs from '@emailjs/browser'
+import React, { useState } from 'react';
+import emailjs from '@emailjs/browser';
 
 const IssueForm = () => {
-
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
+    const [isSubmitted, setIsSubmitted] = useState(false);
+    const [isnotSubmitted, setIsNotSubmitted] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        setIsSubmitting(true);
 
         const serviceId = 'service_ys9e0xn';
         const templateId = 'template_fibp2oc';
         const publicKey = 'azfTQSTn5roYmIK5H';
 
-        const tempateParams = {
+        const templateParams = {
             from_name: name,
             from_email: email,
             to_name: 'Navin Kumaran',
             message: message,
         };
 
-        emailjs.send(serviceId, templateId, tempateParams, publicKey)
+        emailjs.send(serviceId, templateId, templateParams, publicKey)
             .then((response) => {
-                console.log("Email sent Successfully !", response);
                 setName('');
                 setEmail('');
                 setMessage('');
+                setIsSubmitting(false);
+                setIsSubmitted(true);
+                setIsNotSubmitted(false);
             })
             .catch((error) => {
-                console.error("Error sending email", error);
+                setIsSubmitting(false);
+                setIsNotSubmitted(true);
+                setIsSubmitted(false);
             });
     };
-
-
 
     return (
         <footer className="bg-gray-900 pt-5 px-3">
@@ -69,13 +73,16 @@ const IssueForm = () => {
                     ></textarea>
                     <button
                         className="inline-block w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                        type="submit">
-                        SUBMIT ISSUE
+                        type="submit"
+                    >
+                        {isSubmitting ? "Submitting..." : "SUBMIT ISSUE"}
                     </button>
+                    {isSubmitted && <p className="bg-white rounded-md text-center p-2 mt-2 font-bold text-green-500 text-sm mb-2">Issue submitted successfully!</p>}
+                    {isnotSubmitted && <p className="bg-white rounded-md text-center p-2 mt-2 font-bold text-red-500 text-sm mb-2">Failed to submit issue. Try again later!</p>}
                 </div>
             </form>
-        </footer >
-    )
+        </footer>
+    );
 }
 
-export default IssueForm
+export default IssueForm;
