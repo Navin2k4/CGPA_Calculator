@@ -266,36 +266,18 @@ function Calculator() {
             <div>
                 {subjects.map((subject, subjectIndex) => (
                     <div className='flex flex-col flex-wrap w-full' key={subjectIndex}>
-                        <div className='w-full py-4'>
-                            <h4 className='text-2xl text-teal-800 tracking-wider font-semibold'>SUBJECT {subjectIndex + 1}</h4>
-                        </div>
-                        <div className='w-full py-3'>
-                            <Select
-                                name="courseName"
-                                required
-                                onChange={(e) => handleCourseSelect(e, subjectIndex)}
-                            >
-                                <option value="">Select Course</option>
-                                <optgroup label="REGULAR COURSES">
-                                    {(semesterData?.semesters[semesterIndex - 1]?.courses || []).map(course => {
-                                        const courseValue = `${course.course_name} (${course.course_code})`;
-                                        const isCourseSelected = selectedCourses.has(courseValue);
-                                        return (
-                                            <option
-                                                key={course._id}
-                                                value={courseValue}
-                                                disabled={isCourseSelected}
-                                            >
-                                                {isCourseSelected ? course.course_name : `${course.course_code} - ${course.course_name}`}
-                                            </option>
-                                        );
-                                    })}
-                                </optgroup>
 
-                                {semesterIndex > 4 && electiveData?.verticals.map(vertical => (
-                                    <optgroup key={vertical.vertical_name} label={`VERTICAL ${vertical.vertical_number} - ${vertical.vertical_name}`}>
-                                        {vertical.courses.map(course => {
-                                            const courseValue = `${course.elective_name} (${course.elective_code})`;
+                        <div className='flex flex-col lg:flex-row gap-2 items-center'>
+                            <div className='w-full'>
+                                <Select
+                                    name="courseName"
+                                    required
+                                    onChange={(e) => handleCourseSelect(e, subjectIndex)}
+                                >
+                                    <option value="">Select Course</option>
+                                    <optgroup label="CORE SUBJECTS">
+                                        {(semesterData?.semesters[semesterIndex - 1]?.courses || []).map(course => {
+                                            const courseValue = `${course.course_name} (${course.course_code})`;
                                             const isCourseSelected = selectedCourses.has(courseValue);
                                             return (
                                                 <option
@@ -303,18 +285,34 @@ function Calculator() {
                                                     value={courseValue}
                                                     disabled={isCourseSelected}
                                                 >
-                                                    {isCourseSelected ? course.elective_name : `${course.elective_code} - ${course.elective_name}`}
+                                                    {isCourseSelected ? course.course_name : `${course.course_code} - ${course.course_name}`}
                                                 </option>
                                             );
                                         })}
                                     </optgroup>
-                                ))}
 
-                            </Select>
-                        </div>
+                                    {semesterIndex > 4 && electiveData?.verticals.map(vertical => (
+                                        <optgroup key={vertical.vertical_name} label={`VERTICAL ${vertical.vertical_number} - ${vertical.vertical_name}`}>
+                                            {vertical.courses.map(course => {
+                                                const courseValue = `${course.elective_name} (${course.elective_code})`;
+                                                const isCourseSelected = selectedCourses.has(courseValue);
+                                                return (
+                                                    <option
+                                                        key={course._id}
+                                                        value={courseValue}
+                                                        disabled={isCourseSelected}
+                                                    >
+                                                        {isCourseSelected ? course.elective_name : `${course.elective_code} - ${course.elective_name}`}
+                                                    </option>
+                                                );
+                                            })}
+                                        </optgroup>
+                                    ))}
 
-                        <div className='flex flex-row items-center gap-2'>
-                            <div className='w-1/3'>
+                                </Select>
+                            </div>
+
+                            <div className='w-1/2'>
                                 <FloatingLabel
                                     variant='filled'
                                     label='Course Code'
@@ -326,7 +324,7 @@ function Calculator() {
                                     disabled
                                 />
                             </div>
-                            <div className='w-1/3'>
+                            <div className='w-full'>
                                 <FloatingLabel
                                     variant='filled'
                                     label='Credits'
@@ -340,7 +338,7 @@ function Calculator() {
                                     disabled
                                 />
                             </div>
-                            <div className='w-1/3'>
+                            <div className='w-full'>
                                 <Select
                                     value={subject.grade}
                                     onChange={(e) => handleSubjectChange(e, semesterIndex, subjectIndex, 'grade')}
@@ -357,8 +355,6 @@ function Calculator() {
                                 </Select>
                             </div>
                         </div>
-
-
                     </div>
 
                 ))}
@@ -368,8 +364,10 @@ function Calculator() {
 
 
     const incrementNumSemesters = () => {
-        const updatedNumSemesters = numSemesters + 1;
-        handleNumSemestersChange({ target: { value: updatedNumSemesters } });
+        if (numSemesters < 8) {
+            const updatedNumSemesters = numSemesters + 1;
+            handleNumSemestersChange({ target: { value: updatedNumSemesters } });
+        }
     };
 
     const decrementNumSemesters = () => {
@@ -381,13 +379,13 @@ function Calculator() {
 
 
 
+
     return (
         <div className='mb-20'>
-            <div className="p-3 md:p-6 max-w-3xl mx-auto md:my-7 bg-white md:rounded-lg shadow-md">
+            <div className="p-3 md:p-6 max-w-6xl mx-auto md:my-7 bg-white md:rounded-lg shadow-md">
                 <h1 className="text-xl md:text-3xl font-semibold text-center text-gray-800 mb-6  ">Enter Your Details</h1>
                 <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
                     <FloatingLabel
-
                         variant="filled"
                         type="text"
                         label="Student Name ( Eg : ADAM K ) "
