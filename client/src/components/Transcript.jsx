@@ -2,7 +2,8 @@ import React from 'react';
 import html2pdf from 'html2pdf.js';
 import { Table } from 'flowbite-react';
 
-function Transcript({ studentInfo, numSemesters, semesterData, cgpa }) {
+function Transcript({ studentInfo, selectedCourses, courseGrades, cgpa, numSemesters }) {
+
     const handleDownloadPDF = () => {
         const element = document.getElementById('transcript-container');
 
@@ -27,48 +28,62 @@ function Transcript({ studentInfo, numSemesters, semesterData, cgpa }) {
             <div>
                 <h2 className="text-2xl text-center mb-6 font-semibold">Academic Grades</h2>
                 <div className="flex flex-col gap-4">
-                    {semesterData.map((subjects, semesterIndex) => (
-                        <div key={semesterIndex} className="bg-white shadow-md rounded-lg overflow-hidden">
+                    {Array.from({ length: numSemesters }, (_, semesterIndex) => (
+                        <div key={semesterIndex} className="bg-white shadow-md rounded-lg overflow-hidden page-break">
                             <div className="p-6 bg-gray-50 border-b border-gray-200">
-                                <h3 className="text-xl font-semibold mb-4">Semester {semesterIndex + 1} -
-                                    <span className="text-gray-500 text-[18px] ">{semesterIndex % 2 !== 0 ? " EVEN" : " ODD"} Semester</span></h3>
+                                <h3 className="text-xl font-semibold ">
+                                    Semester {semesterIndex + 1} -
+                                    <span className="text-black text-[20px]">
+                                        {semesterIndex % 2 !== 0 ? " EVEN" : " ODD"} Semester
+                                    </span>
+                                </h3>
                             </div>
                             <div className="px-6 py-4">
-                                <Table className="w-full">
-                                    <thead className=''>
-                                        <tr className="text-left font-semibold border-b border-gray-200">
+                                <table className="w-full">
+                                    <thead>
+                                        <tr className="text-left text-[17px] border-b border-gray-200">
                                             <th className="w-2/5 lg:w-3/5 py-2">Course Title</th>
                                             <th className="w-1/5 lg:w-1/5 py-2">Course Code</th>
                                             <th className="w-1/5 lg:w-1/5 py-2">Credits</th>
                                             <th className="w-1/5 lg:w-1/5 py-2">Grade</th>
                                         </tr>
                                     </thead>
-                                    <tbody> {/* Add tbody here */}
-                                        {subjects.map((subject, subjectIndex) => (
-                                            <tr key={subjectIndex} className="border-b border-gray-200">
-                                                <td className="py-3 font-semibold">{subject.title}</td>
-                                                <td className="py-3 font-semibold">{subject.code}</td>
-                                                <td className="py-3 font-semibold">{subject.credits}</td>
-                                                <td className="py-3 font-semibold">{subject.grade}</td>
+                                    <tbody>
+                                        {courseGrades[semesterIndex]?.map((course, courseIndex) => (
+                                            <tr key={courseIndex} className="border-b border-gray-200">
+                                                <td className="py-3 font-semibold">{course.course_name}</td>
+                                                <td className="py-3 font-semibold">{course.course_code}</td>
+                                                <td className="py-3 font-semibold">{course.course_credit}</td>
+                                                <td className="py-3 font-semibold">{course.grade}</td>
+                                            </tr>
+                                        ))}
+                                        {selectedCourses[semesterIndex]?.map((course, courseIndex) => (
+                                            <tr key={courseIndex} className="border-b border-gray-200">
+                                                <td className="py-3 font-semibold">{course.elective_name}</td>
+                                                <td className="py-3 font-semibold">{course.elective_code}</td>
+                                                <td className="py-3 font-semibold">{course.elective_credit}</td>
+                                                <td className="py-3 font-semibold">{course.grade}</td>
                                             </tr>
                                         ))}
                                     </tbody>
-                                </Table>
+                                </table>
                             </div>
                         </div>
+
                     ))}
                 </div>
                 <div className="text-center mt-8">
-                    <h3 className="text-2xl font-normal ">{cgpa !== null ? `OVERALL CGPA : ${cgpa.toFixed(2)}` : ''}</h3>
+                    <h3 className="text-2xl font-normal ">
+                        {cgpa !== null ? `OVERALL CGPA : ${cgpa.toFixed(2)}` : ''}
+                    </h3>
                 </div>
             </div>
         );
     };
 
-
     return (
         <>
-            <div id="transcript-container" className=" max-w-4xl mx-auto font-sans text-base leading-normal">
+            <div id="transcript-container" className="max-w-4xl mx-auto font-sans text-base leading-normal">
                 <div className="container mx-auto">
                     <div className="flex flex-col lg:flex-row justify-evenly items-center p-4 gap-4">
                         <div>
@@ -76,7 +91,7 @@ function Transcript({ studentInfo, numSemesters, semesterData, cgpa }) {
                         </div>
                         <div className="text-center">
                             <h1 className="text-2xl font-bold">Velammal College of Engineering and Technology</h1>
-                            <h2 className='text-lg'>(Autonomous)</h2>
+                            <h2 className="text-lg">(Autonomous)</h2>
                             <p className="text-lg">Madurai – 625 009</p>
                         </div>
                     </div>
@@ -113,8 +128,10 @@ function Transcript({ studentInfo, numSemesters, semesterData, cgpa }) {
                     </div>
                 </div>
             </div>
-            <div className='items-center text-center'>
-                <button onClick={handleDownloadPDF} className="mb-8 py-3 px-6 bg-blue-600 text-white rounded-lg hover:bg-blue-700">DOWNLOAD AS PDF</button>
+            <div className="text-center mt-8">
+                <button onClick={handleDownloadPDF} className="mb-8 py-3 px-6 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    DOWNLOAD AS PDF
+                </button>
             </div>
         </>
     );
