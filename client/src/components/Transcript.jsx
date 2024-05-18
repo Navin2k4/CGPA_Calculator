@@ -144,10 +144,10 @@ function Transcript({ studentInfo, selectedCourses, courseGrades, gpa, cgpa, num
                                     ))}
                                     {selectedCourses[semesterIndex]?.map((course, courseIndex) => (
                                         <tr key={courseIndex} className="border-b border-gray-200">
-                                            <td className="py-3 font-semibold">{course.elective_name}</td>
-                                            <td className="py-3 font-semibold">{course.elective_code}</td>
-                                            <td className="py-3 font-semibold">{course.elective_credit}</td>
-                                            <td className="py-3 font-semibold">{course.grade}</td>
+                                            <td className="py-3 ">{course.elective_code}</td>
+                                            <td className="py-3 ">{course.elective_name}</td>
+                                            <td className="py-3 text-center">{course.elective_credit}</td>
+                                            <td className="py-3 text-center">{course.grade}</td>
                                         </tr>
                                     ))}
                                 </tbody>

@@ -4,6 +4,7 @@ import { Alert } from 'flowbite-react';
 import { useFetchSemesters, useFetchVerticals } from './useFetchData';
 import { Select, FloatingLabel } from 'flowbite-react';
 import Transcript from '../components/Transcript';
+import HowToUse from '../components/HowToUse';
 const gradeScale = { 'O': 10, 'A+': 9, 'A': 8, 'B+': 7, 'B': 6, 'C': 5, 'U': 0 };
 
 const StudentData = () => {
@@ -223,9 +224,11 @@ const StudentData = () => {
     return (
         <div className="flex flex-col items-center justify-center bg-gray-100 md:p-10">
             <div className="bg-white px-3 py-6 rounded-lg shadow-lg w-full max-w-5xl">
+                <HowToUse />
+
                 <h1 className="text-xl md:text-3xl tracking-wider text-center text-gray-800">Welcome, {studentInfo.name}!</h1>
                 {studentInfo ? (
-                    <div className="bg-white shadow-md rounded-lg p-6">
+                    <div className=" mx-auto max-w-2xl bg-white shadow-md rounded-lg p-6">
                         <p className="text-lg  mb-4 text-center">Student Information</p>
                         <div className="flex flex-col lg:flex-row justify-around">
                             <div>
@@ -285,7 +288,7 @@ const StudentData = () => {
                         </div>
                     </div>
                     {Array.from({ length: numSemesters }, (_, index) => (
-                        <div key={`semester_${index}`} className="w-full bg-white rounded-lg shadow-lg p-3 lg:p-6 mb-8 ">
+                        <div key={`semester_${index}`} className="w-full bg-white rounded-lg shadow-lg p-3 lg:px-10 mb-8 ">
                             <h3 className="text-[22px] md:text-2xl font-semibold text-center text-gray-800 mb-4 tracking-widest">SEMESTER {index + 1} - {index % 2 === 0 ? " ODD" : " EVEN"}</h3>
                             <div>
                                 {semesterData && (
