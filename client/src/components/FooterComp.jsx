@@ -2,7 +2,7 @@ const FooterComp = () => {
     const currentYear = new Date().getFullYear();
 
     return (
-        <footer className="bg-gray-800 text-white py-6">
+        <footer className="bg-gray-800 text-white py-6 px-4">
             <div className="container mx-auto text-center">
                 <div className="flex flex-col items-center space-y-2">
                     <p className="text-[14px]">Velemmal College of Engineering and Technology, Madurai</p>
