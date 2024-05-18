@@ -19,6 +19,7 @@ const StudentData = () => {
     const [selectedCourses, setSelectedCourses] = useState(Array.from({ length: 8 }, () => []));
     const [selectedElectives, setSelectedElectives] = useState(new Set());
     const [courseGrades, setCourseGrades] = useState([]);
+    const [gpa, setGpa] = useState([]);
     const [cgpa, setCgpa] = useState(null);
     const [showTranscript, setShowTranscript] = useState(false);
     const semesterData = semesters.find(semester => semester.department_acronym === departmentAcronym);
@@ -162,11 +163,12 @@ const StudentData = () => {
             const updatedNumElectives = [...numElectivesPerSemester];
             const updatedSelectedCourses = [...selectedCourses];
             const updatedSelectedElectives = new Set(selectedElectives);
-            const courseToRemove = updatedSelectedCourses[index][updatedNumElectives[index] - 1];
-            if (courseToRemove) {
-                updatedSelectedElectives.delete(courseToRemove.elective_code);
+            const lastSelectedIndex = updatedSelectedCourses[index].length - 1;
+            if (lastSelectedIndex >= 0) {
+                const lastElective = updatedSelectedCourses[index][lastSelectedIndex];
+                updatedSelectedElectives.delete(lastElective.elective_code);
+                updatedSelectedCourses[index].splice(lastSelectedIndex, 1);
             }
-            updatedSelectedCourses[index] = updatedSelectedCourses[index].slice(0, -1);
             updatedNumElectives[index] -= 1;
             setNumElectivesPerSemester(updatedNumElectives);
             setSelectedCourses(updatedSelectedCourses);
@@ -174,27 +176,46 @@ const StudentData = () => {
         }
     };
 
+
+
+
+
     const handleSubmit = (event) => {
         event.preventDefault();
+
         let totalCredits = 0;
         let totalMarks = 0;
-        selectedCourses.forEach((semesterCourses, semesterIndex) => {
-            semesterCourses.forEach((course) => {
+        const newGpa = [];
+        for (let semesterIndex = 0; semesterIndex < Math.min(selectedCourses.length, courseGrades.length); semesterIndex++) {
+            let semesterTotalCredits = 0;
+            let semesterTotalMarks = 0;
+
+            selectedCourses[semesterIndex].forEach((course) => {
                 const grade = course.grade;
                 const credits = parseFloat(course.elective_credit);
-                totalMarks += gradeScale[grade] * credits;
-                totalCredits += credits;
+                semesterTotalMarks += gradeScale[grade] * credits;
+                semesterTotalCredits += credits;
             });
-        });
-        courseGrades.forEach((semesterGrades) => {
-            semesterGrades.forEach((gradeData) => {
+
+            courseGrades[semesterIndex].forEach((gradeData) => {
                 const grade = gradeData.grade;
                 const credits = parseFloat(gradeData.course_credit);
-                totalMarks += gradeScale[grade] * credits;
-                totalCredits += credits;
+                semesterTotalMarks += gradeScale[grade] * credits;
+                semesterTotalCredits += credits;
             });
-        });
-        const currentCgpa = totalMarks / totalCredits;
+            if (semesterTotalCredits > 0) {
+                const semesterGpa = semesterTotalMarks / semesterTotalCredits;
+                newGpa.push(semesterGpa);
+            } else {
+                newGpa.push(0);
+            }
+
+            totalMarks += semesterTotalMarks;
+            totalCredits += semesterTotalCredits;
+        }
+
+        const currentCgpa = totalCredits > 0 ? totalMarks / totalCredits : 0;
+        setGpa(newGpa);
         setCgpa(currentCgpa);
         setShowTranscript(true);
     };
@@ -202,10 +223,10 @@ const StudentData = () => {
     return (
         <div className="flex flex-col items-center justify-center bg-gray-100 md:p-10">
             <div className="bg-white px-3 py-6 rounded-lg shadow-lg w-full max-w-5xl">
-                <h1 className="text-xl md:text-3xl font-bold text-center text-gray-800">Welcome, {studentInfo.name}!</h1>
+                <h1 className="text-xl md:text-3xl tracking-wider text-center text-gray-800">Welcome, {studentInfo.name}!</h1>
                 {studentInfo ? (
                     <div className="bg-white shadow-md rounded-lg p-6">
-                        <p className="text-lg font-semibold mb-4 text-center">Student Information</p>
+                        <p className="text-lg  mb-4 text-center">Student Information</p>
                         <div className="flex flex-col lg:flex-row justify-around">
                             <div>
                                 <div className="flex flex-col pb-2">
@@ -430,13 +451,18 @@ const StudentData = () => {
                     <div className="flex flex-col-reverse sm:flex-row justify-between">
                         <div className="bg-blue-300 text-center p-2 sm:p-4 m-2 sm:m-4 text-base sm:text-lg rounded-lg font-semibold shadow-md text-gray-900 flex items-center justify-center">
                             <span className="mr-2">Your CGPA:</span>
-                            <span className="text-lg sm:text-2xl text-blue-900">{cgpa ? parseFloat(cgpa).toFixed(3) : "-"}</span>
+                            <span className="text-lg sm:text-2xl text-blue-900">{cgpa ? parseFloat(cgpa).toFixed(2) : "-"}</span>
                         </div>
                         <button
                             type='submit'
-                            className="bg-blue-300 text-center p-2 sm:p-4 m-2 sm:m-4 text-base sm:text-lg rounded-lg font-semibold hover:bg-blue-400 hover:tracking-widest hover:px-7 shadow-md hover:shadow-lg text-gray-900 transition-all duration-300 hover:text-white">
+                            className={`text-center p-2 sm:p-4 m-2 sm:m-4 text-base sm:text-lg rounded-lg font-semibold shadow-md transition-all duration-300 ${numSemesters === 0 ? 'bg-slate-100 cursor-not-allowed text-gray-500' : 'bg-blue-300 hover:bg-blue-400 hover:tracking-widest hover:px-7 hover:shadow-lg hover:text-white'
+                                }`}
+                            disabled={numSemesters === 0}
+                        >
                             Calculate CGPA
                         </button>
+
+
                     </div>
 
                 </form>
@@ -446,6 +472,7 @@ const StudentData = () => {
                             studentInfo={studentInfo}
                             courseGrades={courseGrades}
                             selectedCourses={selectedCourses}
+                            gpa={gpa}
                             cgpa={cgpa}
                             numSemesters={numSemesters}
                         />
