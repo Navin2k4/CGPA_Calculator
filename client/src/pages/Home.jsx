@@ -44,7 +44,7 @@ const Home = () => {
     };
 
     return (
-        <div className='mx-10 my-20 md:m-20 items-center justify-center'>
+        <div className='mx-8 my-16 md:m-20 items-center justify-center'>
             <div className="p-3 md:p-6 max-w-3xl  mx-auto md:my-7 bg-white rounded-lg shadow-md">
                 <h1 className="text-xl md:text-3xl font-semibold text-center text-gray-800 mb-6">Enter Your Details</h1>
                 <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
@@ -90,7 +90,7 @@ const Home = () => {
                         ))}
                     </Select>
 
-                    <button type="submit" className="bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition duration-300 ease-in-out">
+                    <button type="submit" className="bg-blue-300 text-black text-lg tracking-widest py-3 rounded-lg hover:bg-blue-600 transition duration-300 ease-in-out">
                         Next
                     </button>
                 </form>

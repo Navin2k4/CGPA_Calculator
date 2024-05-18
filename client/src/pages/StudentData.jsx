@@ -450,12 +450,12 @@ const StudentData = () => {
                     ))}
                     <div className="flex flex-col-reverse sm:flex-row justify-between">
                         <div className="bg-blue-300 text-center p-2 sm:p-4 m-2 sm:m-4 text-base sm:text-lg rounded-lg font-semibold shadow-md text-gray-900 flex items-center justify-center">
-                            <span className="mr-2">Your CGPA:</span>
+                            <span className="mr-2">Your CGPA : </span>
                             <span className="text-lg sm:text-2xl text-blue-900">{cgpa ? parseFloat(cgpa).toFixed(2) : "-"}</span>
                         </div>
                         <button
                             type='submit'
-                            className={`text-center p-2 sm:p-4 m-2 sm:m-4 text-base sm:text-lg rounded-lg font-semibold shadow-md transition-all duration-300 ${numSemesters === 0 ? 'bg-slate-100 cursor-not-allowed text-gray-500' : 'bg-blue-300 hover:bg-blue-400 hover:tracking-widest hover:px-7 hover:shadow-lg hover:text-white'
+                            className={`text-center p-2 sm:p-4 m-2 sm:m-4 text-base sm:text-lg rounded-lg font-semibold shadow-md transition-all duration-300 ${numSemesters === 0 ? 'bg-slate-100 cursor-not-allowed text-gray-500' : 'bg-blue-300 hover:bg-blue-400  hover:shadow-lg '
                                 }`}
                             disabled={numSemesters === 0}
                         >

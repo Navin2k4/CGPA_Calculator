@@ -1,14 +1,18 @@
 const FooterComp = () => {
+    const currentYear = new Date().getFullYear();
+
     return (
-        <footer className="bg-gray-900 text-white py-6">
+        <footer className="bg-gray-800 text-white py-6">
             <div className="container mx-auto text-center">
-                <p className="text-[14px] m-2">Velemmal College of Engineering and Technology, Madurai</p>
-                <p className="text-[14px] m-2">Department of Computer Science and Engineering</p>
-                <hr></hr>
-                <p className="text-[12px] m-4">&copy; {new Date().getFullYear()} Navinkumaran O H, 2022-2026 batch, and Mr. S. Murali, AP/CSE. All Rights Reserved.</p>
+                <div className="flex flex-col items-center space-y-2">
+                    <p className="text-[14px]">Velemmal College of Engineering and Technology, Madurai</p>
+                    <p className="text-[14px]">Department of Computer Science and Engineering</p>
+                    <hr className="w-1/2 my-4 border-gray-700" />
+                    <p className="text-[12px]">&copy; {currentYear} Mr. S. Murali, AP/CSE and Navinkumaran O H, (2022-2026) Batch <br></br> All Rights Reserved.</p>
+                </div>
             </div>
         </footer>
-    )
+    );
 }
 
-export default FooterComp
+export default FooterComp;
