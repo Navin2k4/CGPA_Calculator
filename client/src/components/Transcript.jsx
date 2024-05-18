@@ -197,10 +197,9 @@ function Transcript({ studentInfo, selectedCourses, courseGrades, gpa, cgpa, num
                 <div className="container mx-auto">
                     {renderStudentDetails()}
                     {renderSemesterGPA()}
-                    {Array.from({ length: numSemesters }, (_, semesterIndex) => renderSemesterDetails(semesterIndex))}
+                    {renderSemesterDetails()}
                 </div>
             </div>
-
             <div className="hidden">
                 <div ref={downloadContainerRef}>
                     <div className="first-page">
