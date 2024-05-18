@@ -12,18 +12,15 @@ const IssueForm = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         setIsSubmitting(true);
-
         const serviceId = 'service_ys9e0xn';
         const templateId = 'template_fibp2oc';
         const publicKey = 'azfTQSTn5roYmIK5H';
-
         const templateParams = {
             from_name: name,
             from_email: email,
             to_name: 'Navin Kumaran',
             message: message,
         };
-
         emailjs.send(serviceId, templateId, templateParams, publicKey)
             .then((response) => {
                 setName('');
@@ -43,11 +40,11 @@ const IssueForm = () => {
     return (
         <footer className="bg-gray-900 pt-5 px-3">
             <form onSubmit={handleSubmit} className='emailForm'>
-                <div className="max-w-xl mx-auto bg-gray-500 shadow-md rounded-xl px-4 py-3">
+                <div className="max-w-sm md:max-w-lg mx-auto bg-gray-500 shadow-md rounded-xl px-4 py-3">
                     <h2 className="text-lg font-bold mb-2 text-white text-center p-2">SUBMIT AN ISSUE</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-1">
                         <input
-                            className="block w-full mb-2 px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            className="block w-full border border-gray-300 rounded-md shadow-sm text-sm placeholder-gray-400" 
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
@@ -55,7 +52,7 @@ const IssueForm = () => {
                             required
                         />
                         <input
-                            className="block w-full mb-2 px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            className="block w-full border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none text-sm"
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -64,8 +61,8 @@ const IssueForm = () => {
                         />
                     </div>
                     <textarea
-                        className="block w-full mb-2 px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                        rows="2"
+                        className="block w-full my-2  border border-gray-300 rounded-md shadow-sm placeholder-gray-400 text-sm"
+                        rows="1"
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                         placeholder="Describe your issue"

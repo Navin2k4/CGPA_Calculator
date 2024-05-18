@@ -44,8 +44,8 @@ const Home = () => {
     };
 
     return (
-        <div className='py-10 mx-7'>
-            <div className="p-3 md:p-6 max-w-6xl mx-auto md:my-7 bg-white rounded-sm md:rounded-lg shadow-md">
+        <div className='mx-10 my-20 md:m-20 items-center justify-center'>
+            <div className="p-3 md:p-6 max-w-3xl  mx-auto md:my-7 bg-white rounded-lg shadow-md">
                 <h1 className="text-xl md:text-3xl font-semibold text-center text-gray-800 mb-6">Enter Your Details</h1>
                 <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
                     <FloatingLabel
@@ -76,6 +76,7 @@ const Home = () => {
                         required
                     />
                     <Select
+                        className='pb-3'
                         value={studentInfo.department}
                         onChange={handleStudentInfoChange}
                         name="department"

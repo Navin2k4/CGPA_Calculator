@@ -1,14 +1,12 @@
 import { useLocation } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import { TextInput, Alert } from 'flowbite-react';
+import { Alert } from 'flowbite-react';
 import { useFetchSemesters, useFetchVerticals } from './useFetchData';
 import { Select, FloatingLabel } from 'flowbite-react';
 import Transcript from '../components/Transcript';
 const gradeScale = { 'O': 10, 'A+': 9, 'A': 8, 'B+': 7, 'B': 6, 'C': 5, 'U': 0 };
 
 const StudentData = () => {
-
-    // State declarations
     const location = useLocation();
     const { studentInfo } = location.state || {};
     const initialNumSemesters = parseInt(localStorage.getItem('numSemesters')) || 0;
@@ -23,13 +21,9 @@ const StudentData = () => {
     const [courseGrades, setCourseGrades] = useState([]);
     const [cgpa, setCgpa] = useState(null);
     const [showTranscript, setShowTranscript] = useState(false);
-
     const semesterData = semesters.find(semester => semester.department_acronym === departmentAcronym);
     const electiveData = electives.find(elective => elective.department_acronym === departmentAcronym);
 
-
-
-    // Effects
     useEffect(() => {
         if (studentInfo && studentInfo.department) {
             const acronym = studentInfo.department.split(' - ')[0];
@@ -37,21 +31,17 @@ const StudentData = () => {
         }
     }, [studentInfo]);
 
-    // Saving state to localStorage
     useEffect(() => {
         localStorage.setItem('numSemesters', numSemesters.toString());
         localStorage.setItem('numElectivesPerSemester', JSON.stringify(numElectivesPerSemester));
     }, [numSemesters, selectedCourses, courseGrades, numElectivesPerSemester]);
 
-    // Retrieving state from localStorage
     useEffect(() => {
         const storedNumSemesters = parseInt(localStorage.getItem('numSemesters')) || 0;
         const storedNumElectivesPerSemester = JSON.parse(localStorage.getItem('numElectivesPerSemester')) || Array.from({ length: storedNumSemesters }, () => 0);
-
         setNumSemesters(storedNumSemesters);
         setNumElectivesPerSemester(storedNumElectivesPerSemester);
     }, []);
-
 
     useEffect(() => {
         setCourseGrades(prevCourseGrades => {
@@ -63,42 +53,31 @@ const StudentData = () => {
         });
     }, [numSemesters]);
 
-
-
     const handleNumSemestersChange = (event) => {
         setShowTranscript(false);
         const value = Number(event.target.value);
         if (value >= 0 && value <= 8) {
-            // Remove data for semesters beyond the new number of semesters
             const updatedSelectedCourses = selectedCourses.slice(0, value);
             const updatedCourseGrades = courseGrades.slice(0, value);
-
-            // If the number of semesters is reduced, clear the data for removed semesters
             if (value < numSemesters) {
                 updatedSelectedCourses.splice(value);
                 updatedCourseGrades.splice(value);
             }
-
             setNumSemesters(value);
             setSelectedCourses(updatedSelectedCourses);
             setCourseGrades(updatedCourseGrades);
         }
     };
 
-
-
     const handleCourseSelect = (event, semesterIndex, electiveIndex, selectedGrade) => {
         setShowTranscript(false);
         const selectedCourseValue = event.target.value;
         const updatedSelectedCourses = [...selectedCourses];
         const updatedSelectedElectives = new Set(selectedElectives);
-
         const previousCourse = updatedSelectedCourses[semesterIndex][electiveIndex];
-
         if (previousCourse) {
             updatedSelectedElectives.delete(previousCourse.elective_code);
         }
-
         if (selectedCourseValue === "") {
             updatedSelectedCourses[semesterIndex][electiveIndex] = {
                 elective_name: "",
@@ -110,10 +89,8 @@ const StudentData = () => {
             const electiveCourse = electiveData?.verticals
                 .flatMap(vertical => vertical.courses)
                 .find(course => `${course.elective_name} (${course.elective_code})` === selectedCourseValue);
-
             if (electiveCourse) {
                 updatedSelectedElectives.add(electiveCourse.elective_code);
-
                 updatedSelectedCourses[semesterIndex][electiveIndex] = {
                     elective_name: electiveCourse.elective_name,
                     elective_code: electiveCourse.elective_code,
@@ -122,11 +99,9 @@ const StudentData = () => {
                 };
             }
         }
-
         setSelectedCourses(updatedSelectedCourses);
         setSelectedElectives(updatedSelectedElectives);
     };
-
 
     const handleGradeSelect = (event, semesterIndex, courseIndex) => {
         setShowTranscript(false);
@@ -139,14 +114,13 @@ const StudentData = () => {
             course_credit: course.course_credits,
             grade: selectedGrade
         };
-
         if (!updatedCourseGrades[semesterIndex]) {
             updatedCourseGrades[semesterIndex] = [];
         }
         updatedCourseGrades[semesterIndex][courseIndex] = gradeData;
-
         setCourseGrades(updatedCourseGrades);
     };
+
     const handleElectiveGradeSelect = (event, semesterIndex, electiveIndex) => {
         const selectedGrade = event.target.value;
         const updatedSelectedCourses = [...selectedCourses];
@@ -154,14 +128,12 @@ const StudentData = () => {
         setSelectedCourses(updatedSelectedCourses);
     };
 
-
     const handleChangeNumElectives = (event, index) => {
         setShowTranscript(false);
         const newValue = parseInt(event.target.value);
         const updatedNumElectivesPerSemester = [...numElectivesPerSemester];
         const updatedSelectedCourses = [...selectedCourses];
         const updatedSelectedElectives = new Set(selectedElectives);
-
         if (newValue < numElectivesPerSemester[index]) {
             for (let i = newValue; i < numElectivesPerSemester[index]; i++) {
                 const courseToRemove = updatedSelectedCourses[index][i];
@@ -171,7 +143,6 @@ const StudentData = () => {
             }
             updatedSelectedCourses[index] = updatedSelectedCourses[index].slice(0, newValue);
         }
-
         updatedNumElectivesPerSemester[index] = newValue;
         setNumElectivesPerSemester(updatedNumElectivesPerSemester);
         setSelectedCourses(updatedSelectedCourses);
@@ -191,15 +162,12 @@ const StudentData = () => {
             const updatedNumElectives = [...numElectivesPerSemester];
             const updatedSelectedCourses = [...selectedCourses];
             const updatedSelectedElectives = new Set(selectedElectives);
-
             const courseToRemove = updatedSelectedCourses[index][updatedNumElectives[index] - 1];
             if (courseToRemove) {
                 updatedSelectedElectives.delete(courseToRemove.elective_code);
             }
-
             updatedSelectedCourses[index] = updatedSelectedCourses[index].slice(0, -1);
             updatedNumElectives[index] -= 1;
-
             setNumElectivesPerSemester(updatedNumElectives);
             setSelectedCourses(updatedSelectedCourses);
             setSelectedElectives(updatedSelectedElectives);
@@ -208,43 +176,33 @@ const StudentData = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-
         let totalCredits = 0;
         let totalMarks = 0;
-
-        // Iterate over each semester's courses
         selectedCourses.forEach((semesterCourses, semesterIndex) => {
             semesterCourses.forEach((course) => {
-                // Retrieve grade and credits for the course
                 const grade = course.grade;
                 const credits = parseFloat(course.elective_credit);
-
-                // Update total marks and total credits
                 totalMarks += gradeScale[grade] * credits;
                 totalCredits += credits;
             });
         });
-
         courseGrades.forEach((semesterGrades) => {
             semesterGrades.forEach((gradeData) => {
                 const grade = gradeData.grade;
                 const credits = parseFloat(gradeData.course_credit);
-
                 totalMarks += gradeScale[grade] * credits;
                 totalCredits += credits;
             });
         });
-
         const currentCgpa = totalMarks / totalCredits;
-
         setCgpa(currentCgpa);
         setShowTranscript(true);
     };
 
     return (
-        <div className="flex flex-col items-center justify-center bg-gray-100 py-10">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-5xl">
-                <h1 className="text-xl md:text-3xl font-bold text-center text-gray-800 mb-4">Welcome, {studentInfo.name}!</h1>
+        <div className="flex flex-col items-center justify-center bg-gray-100 md:p-10">
+            <div className="bg-white px-3 py-6 rounded-lg shadow-lg w-full max-w-5xl">
+                <h1 className="text-xl md:text-3xl font-bold text-center text-gray-800">Welcome, {studentInfo.name}!</h1>
                 {studentInfo ? (
                     <div className="bg-white shadow-md rounded-lg p-6">
                         <p className="text-lg font-semibold mb-4 text-center">Student Information</p>
@@ -276,9 +234,8 @@ const StudentData = () => {
                     <p className="text-red-500">No student data available</p>
                 )}
                 <form onSubmit={handleSubmit}>
-
-                    <div className="flex flex-col lg:flex-row items-center gap-3 py-4 mt-6">
-                        <Alert color="blue" className="w-full lg:w-1/3 text-center items-center">
+                    <div className="flex flex-col md:flex-row items-center justify-center gap-3 py-4 mt-2">
+                        <Alert color="blue" className="w-full lg:w-1/3 text-md text-center items-center">
                             Select number of semesters
                         </Alert>
                         <div className="flex flex-row items-center gap-3">
@@ -286,18 +243,17 @@ const StudentData = () => {
                                 type="button"
                                 className="px-4 py-2 bg-blue-200 text-black font-bold hover:bg-blue-400 rounded-lg"
                                 onClick={() => setNumSemesters(prev => Math.max(prev - 1, 0))}
-                            >
-                                -
-                            </button>
+                            > - </button>
                             <div className="w-28 items-center">
-                                <TextInput
-                                    className="text-center"
+                                <FloatingLabel
+                                    className="text-center items-center font-semibold"
+                                    variant='standard'
                                     type="number"
                                     value={numSemesters}
                                     onChange={handleNumSemestersChange}
                                     required
-                                    style={{ textAlign: 'center' }} // Added inline style for text alignment
-
+                                    style={{ textAlign: 'center' }}
+                                    disabled
                                 />
                             </div>
                             <button
@@ -309,10 +265,7 @@ const StudentData = () => {
                     </div>
                     {Array.from({ length: numSemesters }, (_, index) => (
                         <div key={`semester_${index}`} className="w-full bg-white rounded-lg shadow-lg p-3 lg:p-6 mb-8 ">
-                            <h3 className="text-[22px] md:text-2xl font-semibold text-center text-gray-800 mb-4 tracking-widest">
-                                SEMESTER {index + 1} - {index % 2 === 0 ? " EVEN" : " ODD"}
-                            </h3>
-
+                            <h3 className="text-[22px] md:text-2xl font-semibold text-center text-gray-800 mb-4 tracking-widest">SEMESTER {index + 1} - {index % 2 === 0 ? " ODD" : " EVEN"}</h3>
                             <div>
                                 {semesterData && (
                                     <div>
@@ -338,8 +291,7 @@ const StudentData = () => {
                                                                 type="text"
                                                                 value={course.course_code}
                                                                 required
-                                                                disabled
-                                                            />
+                                                                disabled />
                                                         </div>
                                                         <div className='w-1/2 lg:w-1/3'>
                                                             <FloatingLabel
@@ -350,15 +302,13 @@ const StudentData = () => {
                                                                 max='4'
                                                                 value={course.course_credits.toString()}
                                                                 required
-                                                                disabled
-                                                            />
+                                                                disabled />
                                                         </div>
                                                         <div className='w-1/2 lg:w-1/3'>
                                                             <Select
                                                                 className=''
                                                                 required
-                                                                onChange={(event) => handleGradeSelect(event, index, courseIndex)}
-                                                            >
+                                                                onChange={(event) => handleGradeSelect(event, index, courseIndex)}>
                                                                 <option value="">Grade</option>
                                                                 {Object.keys(gradeScale).map((grade) => (
                                                                     <option key={grade} value={grade}>
@@ -373,11 +323,10 @@ const StudentData = () => {
                                         </div>
                                     </div>
                                 )}
-
                                 {index >= 4 && electiveData && (
                                     <div className=''>
                                         <div className='px-2 py-3 justify-center flex flex-row items-center gap-2'>
-                                            <h3 className='py-2 text-md md:text-2xl'>Select Number of Electives</h3>
+                                            <h3 className='py-2 text-lg md:text-2xl'>Select Number of Electives</h3>
                                             <button
                                                 type='button'
                                                 className=' px-4 py-2 bg-blue-200 items-center text-black font-bold hover:bg-blue-400 rounded-lg'
@@ -385,7 +334,7 @@ const StudentData = () => {
                                             >-</button>
                                             <div className='w-20 sm:w-40 items-center '>
                                                 <FloatingLabel
-                                                    className='text-center items-center'
+                                                    className='text-center items-center font-semibold'
                                                     variant='standard'
                                                     label=''
                                                     min='0'
@@ -402,7 +351,6 @@ const StudentData = () => {
                                                 onClick={() => incrementNumElectives(index)}
                                             >+</button>
                                         </div>
-
                                         {[...Array(numElectivesPerSemester[index])].map((_, electiveIndex) => (
                                             <div key={`elective_${electiveIndex}`} className='flex flex-col lg:flex-row gap-2 items-center '>
                                                 <div className='w-full '>
@@ -410,9 +358,7 @@ const StudentData = () => {
                                                         required
                                                         defaultValue=""
                                                         onChange={(event) => handleCourseSelect(event, index, electiveIndex)}
-                                                        className="bg-slate-100 p-1 rounded-lg"
-
-                                                    >
+                                                        className="bg-slate-100 p-1 rounded-lg">
                                                         <option
                                                             value="" >Select Vertical</option>
 
@@ -486,7 +432,6 @@ const StudentData = () => {
                             <span className="mr-2">Your CGPA:</span>
                             <span className="text-lg sm:text-2xl text-blue-900">{cgpa ? parseFloat(cgpa).toFixed(3) : "-"}</span>
                         </div>
-
                         <button
                             type='submit'
                             className="bg-blue-300 text-center p-2 sm:p-4 m-2 sm:m-4 text-base sm:text-lg rounded-lg font-semibold hover:bg-blue-400 hover:tracking-widest hover:px-7 shadow-md hover:shadow-lg text-gray-900 transition-all duration-300 hover:text-white">
@@ -507,9 +452,7 @@ const StudentData = () => {
                     )}
                 </div>
             </div>
-
         </div>
     );
 };
-
 export default StudentData;
