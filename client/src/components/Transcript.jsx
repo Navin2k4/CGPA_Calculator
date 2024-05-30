@@ -2,6 +2,12 @@ import React, { useRef, useState } from 'react';
 import html2pdf from 'html2pdf.js';
 import { FaDownload } from 'react-icons/fa';
 import ClipLoader from 'react-spinners/ClipLoader'
+const yearMapping = {
+    1: 'Ist Year',
+    2: 'IInd Year',
+    3: 'IIIrd Year',
+    4: 'IVth Year'
+};
 
 function Transcript({ studentInfo, selectedCourses, courseGrades, gpa, cgpa, numSemesters }) {
     const downloadContainerRef = useRef(null);
@@ -19,10 +25,11 @@ function Transcript({ studentInfo, selectedCourses, courseGrades, gpa, cgpa, num
         const opt = {
             margin: [0.3, 0.6],
             filename: fileName,
-            image: { type: 'png', quality: 1 },
-            html2canvas: { scale: 2, logging: true },
+            image: { type: 'jpeg', quality: 1 },
+            html2canvas: { scale: 2, logging: false },
             jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
         };
+
 
         html2pdf().from(element).set(opt).save().then(() => {
             setLoading(false);
@@ -34,40 +41,48 @@ function Transcript({ studentInfo, selectedCourses, courseGrades, gpa, cgpa, num
     const renderCollegeInfo = () => (
         <div className="flex flex-col lg:flex-row justify-evenly items-center p-4 gap-4">
             <div>
-                <img className="w-32 h-32 rounded-md" src="vcet.jpeg" alt="VCET Logo" />
+                <img className="w-28 h-28 rounded-md" src="vcet.jpeg" alt="VCET Logo" />
             </div>
             <div className="text-center">
-                <h1 className="text-2xl font-bold">Velammal College of Engineering and Technology</h1>
-                <h2 className="text-lg">(Autonomous)</h2>
-                <p className="text-lg">Madurai – 625 009</p>
+                <h1 className="text-xl font-bold">Velammal College of Engineering and Technology</h1>
+                <h2 className="text-md">(Autonomous)</h2>
+                <p className="text-md">Madurai – 625 009</p>
             </div>
         </div>
     );
 
     const renderStudentDetails = () => (
         <div className="">
-            <h2 className="text-xl md:text-2xl tracking-wider text-center mb-6">STUDENT DETAIL</h2>
+            <h2 className="text-[22px] font-semibold tracking-wider text-center mb-6">STUDENT DETAILS</h2>
             <div className="mb-6">
                 <table className="mx-auto bg-white shadow-md rounded-lg overflow-hidden">
                     <tbody>
                         <tr className="border-b border-gray-200">
-                            <td className="font-semibold py-3 px-6 bg-gray-100 text-gray-600">Student Name:</td>
+                            <td className="font-semibold py-3 px-6 bg-gray-100 text-gray-600">Student Name</td>
                             <td className="py-3 px-6">{studentInfo.name}</td>
                         </tr>
                         <tr className="border-b border-gray-200">
-                            <td className="font-semibold py-3 px-6 bg-gray-100 text-gray-600">Roll Number:</td>
+                            <td className="font-semibold py-3 px-6 bg-gray-100 text-gray-600">Roll Number</td>
                             <td className="py-3 px-6">{studentInfo.rollNumber}</td>
                         </tr>
                         <tr className="border-b border-gray-200">
-                            <td className="font-semibold py-3 px-6 bg-gray-100 text-gray-600">Register Number:</td>
+                            <td className="font-semibold py-3 px-6 bg-gray-100 text-gray-600">Register Number</td>
                             <td className="py-3 px-6">{studentInfo.registerNumber}</td>
                         </tr>
                         <tr className="border-b border-gray-200">
-                            <td className="font-semibold py-3 px-6 bg-gray-100 text-gray-600">Department:</td>
+                            <td className="font-semibold py-3 px-6 bg-gray-100 text-gray-600">Department</td>
                             <td className="py-3 px-6">{studentInfo.department}</td>
                         </tr>
+                        <tr className="border-b border-gray-200">
+                            <td className="font-semibold py-3 px-6 bg-gray-100 text-gray-600">Batch</td>
+                            <td className="py-3 px-6">{studentInfo.batch}</td>
+                        </tr>
+                        <tr className="border-b border-gray-200">
+                            <td className="font-semibold py-3 px-6 bg-gray-100 text-gray-600">Year / Section</td>
+                            <td className="py-3 px-6">{yearMapping[studentInfo.year]} / {studentInfo.section}</td>
+                        </tr>
                         <tr>
-                            <td className="font-semibold py-3 px-6 bg-gray-100 text-gray-600">Number of Semesters Attended:</td>
+                            <td className="font-semibold py-3 px-6 bg-gray-100 text-gray-600">Number of Semesters Attended</td>
                             <td className="py-3 px-6">{numSemesters}</td>
                         </tr>
                     </tbody>
@@ -79,7 +94,7 @@ function Transcript({ studentInfo, selectedCourses, courseGrades, gpa, cgpa, num
     const renderSemesterGPA = () => (
         <div className="max-w-xl mx-auto my-4">
             <div className="bg-white shadow-lg rounded-lg overflow-hidden p-4">
-                <h2 className="text-xl md:text-2xl tracking-wider text-center mb-6">GPA OF EACH SEMESTER</h2>
+                <h2 className="text-[22px] font-semibold tracking-wider text-center mb-6">EACH SEMESTER GPA</h2>
                 <table className="w-full">
                     <thead>
                         <tr className="text-left text-[17px] border-b border-gray-200">
@@ -100,9 +115,9 @@ function Transcript({ studentInfo, selectedCourses, courseGrades, gpa, cgpa, num
                         ))}
                     </tbody>
                 </table>
-                <div className="text-center mt-8">
-                    <h3 className="text-2xl font-normal ">
-                        {cgpa !== null ? `OVERALL CGPA : ${cgpa.toFixed(2)}` : ''}
+                <div className="text-center m-4">
+                    <h3 className="text-[24px] font-semibold ">
+                        {cgpa !== null ? `CGPA : ${cgpa.toFixed(2)}` : ''}
                     </h3>
                 </div>
             </div>
@@ -114,7 +129,7 @@ function Transcript({ studentInfo, selectedCourses, courseGrades, gpa, cgpa, num
             <div className="flex flex-col gap-4">
                 {Array.from({ length: numSemesters }, (_, semesterIndex) => (
                     <div key={semesterIndex} className="bg-white shadow-md rounded-lg overflow-hidden py-6 page-break">
-                        <h2 className="text-lg md:text-2xl text-center mb-6 tracking-wider">ACADEMIC GRADES FOR SEMESTER {semesterIndex + 1}</h2>
+                        <h2 className="text-[20px] font-semibold text-center mb-6 tracking-wider">ACADEMIC GRADES FOR SEMESTER {semesterIndex + 1}</h2>
                         <div className="px-6 py-3 flex items-center justify-between bg-gray-100 border-b border-gray-200 pb-4">
                             <h3 className="text-lg md:text-xl lg:text-2xl font-semibold">
                                 Semester {semesterIndex + 1}

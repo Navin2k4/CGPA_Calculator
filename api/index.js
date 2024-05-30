@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import departmentRoutes from './routes/department.route.js';
 import semesterRoutes from './routes/semester.route.js';
 import verticalRoutes from './routes/vertical.route.js';
+import studentRoutes from './routes/student.route.js';
 
 import path from 'path';
 
@@ -29,6 +30,7 @@ app.use(express.json());
 app.use('/api/departments', departmentRoutes);
 app.use('/api/semesters', semesterRoutes);
 app.use('/api/verticals', verticalRoutes);
+app.use('/api/students', studentRoutes);
 
 app.use(express.static(path.join(__dirname, '/client/dist')));
 

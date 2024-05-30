@@ -6,6 +6,12 @@ import { Select, FloatingLabel } from 'flowbite-react';
 import Transcript from '../components/Transcript';
 import HowToUse from '../components/HowToUse';
 const gradeScale = { 'O': 10, 'A+': 9, 'A': 8, 'B+': 7, 'B': 6, 'C': 5, 'U': 0 };
+const yearMapping = {
+    1: 'Ist Year',
+    2: 'IInd Year',
+    3: 'IIIrd Year',
+    4: 'IVth Year'
+};
 
 const StudentData = () => {
     const location = useLocation();
@@ -25,6 +31,9 @@ const StudentData = () => {
     const [showTranscript, setShowTranscript] = useState(false);
     const semesterData = semesters.find(semester => semester.department_acronym === departmentAcronym);
     const electiveData = electives.find(elective => elective.department_acronym === departmentAcronym);
+
+    console.log(studentInfo.year, studentInfo.batch, studentInfo.section);
+
 
     useEffect(() => {
         if (studentInfo && studentInfo.department) {
@@ -177,13 +186,8 @@ const StudentData = () => {
         }
     };
 
-
-
-
-
     const handleSubmit = (event) => {
         event.preventDefault();
-
         let totalCredits = 0;
         let totalMarks = 0;
         const newGpa = [];
@@ -228,31 +232,41 @@ const StudentData = () => {
 
                 <h1 className="text-xl md:text-3xl tracking-wider text-center text-gray-800">Welcome, {studentInfo.name}!</h1>
                 {studentInfo ? (
-                    <div className=" mx-auto max-w-2xl bg-white shadow-md rounded-lg p-6">
-                        <p className="text-lg  mb-4 text-center">Student Information</p>
-                        <div className="flex flex-col lg:flex-row justify-around">
-                            <div>
-                                <div className="flex flex-col pb-2">
-                                    <span className="text-gray-600 text-sm sm:text-lg">Name:</span>
-                                    <span className="text-md">{studentInfo.name}</span>
+                    <div className="mx-auto max-w-2xl bg-white shadow-md rounded-lg p-6">
+                        <h1 className="text-xl mb-4 text-center font-semibold">Student Information</h1>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <div className="flex flex-col space-y-4">
+                                <div className="flex items-center">
+                                    <span className="text-gray-600 text-sm sm:text-lg font-semibold mr-2">Name:</span>
+                                    <span className="text-sm md:text-lg">{studentInfo.name}</span>
                                 </div>
-                                <div className="flex flex-col pb-2">
-                                    <span className="text-gray-600 text-sm sm:text-lg">Roll Number:</span>
-                                    <span className="text-md">{studentInfo.rollNumber}</span>
+                                <div className="flex items-center">
+                                    <span className="text-gray-600 text-sm sm:text-lg font-semibold mr-2">Roll Number:</span>
+                                    <span className="text-sm md:text-lg">{studentInfo.rollNumber}</span>
+                                </div>
+                                <div className="flex items-center">
+                                    <span className="text-gray-600 text-sm sm:text-lg font-semibold mr-2">Register Number:</span>
+                                    <span className="text-sm md:text-lg">{studentInfo.registerNumber}</span>
+                                </div>
+                                <div className="flex">
+                                    <span className="text-gray-600 text-sm sm:text-lg font-semibold mr-2">Department:</span>
+                                    <span className="text-sm md:text-lg">{studentInfo.department}</span>
                                 </div>
                             </div>
-                            <div>
-                                <div className="flex flex-col pb-2">
-                                    <span className="text-gray-600 text-sm sm:text-lg">Register Number:</span>
-                                    <span className="text-md">{studentInfo.registerNumber}</span>
+                            <div className="flex flex-col space-y-4">
+                                <div className="flex items-center">
+                                    <span className="text-gray-600 text-sm sm:text-lg font-semibold mr-2">Year / Section:</span>
+                                    <span className="text-sm md:text-lg">{yearMapping[studentInfo.year]} / {studentInfo.section}</span>
                                 </div>
-                                <div className="flex flex-col">
-                                    <span className="text-gray-600 text-sm sm:text-lg">Department:</span>
-                                    <span className="text-md">{studentInfo.department}</span>
+                                <div className="flex items-center">
+                                    <span className="text-gray-600 text-sm sm:text-lg font-semibold mr-2">Batch:</span>
+                                    <span className="text-sm md:text-lg">{studentInfo.batch}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+
 
                 ) : (
                     <p className="text-red-500">No student data available</p>
@@ -298,7 +312,7 @@ const StudentData = () => {
                                                 <div key={`course_${courseIndex}`} className='flex flex-col lg:flex-row gap-2 items-center'>
                                                     <div className='w-full'>
                                                         <FloatingLabel
-                                                            className='bg-slate-100'
+                                                            className='bg-slate-100 tracking-wide'
                                                             variant='filled'
                                                             label='Course Name'
                                                             type="text"

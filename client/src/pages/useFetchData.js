@@ -17,7 +17,7 @@ export const useFetchDepartments = () => {
         fetchDepartments();
     }, []);
     return departments;
-}
+};
 
 export const useFetchSemesters = (selectedDepartmentAcronym) => {
     const [semesters, setSemesters] = useState([]);
@@ -38,7 +38,7 @@ export const useFetchSemesters = (selectedDepartmentAcronym) => {
         }
     }, [selectedDepartmentAcronym]);
     return semesters;
-}
+};
 
 export const useFetchVerticals = (selectedDepartmentAcronym) => {
     const [electives, setElectives] = useState([]);
@@ -59,4 +59,32 @@ export const useFetchVerticals = (selectedDepartmentAcronym) => {
         }
     }, [selectedDepartmentAcronym]);
     return electives;
-}
+};
+
+
+export const fetchStudentData = async (departmentAcronym, batch, section, setStudents, setShowAlert) => {
+    if (departmentAcronym && batch && section) {
+        try {
+            const res = await fetch(`/api/students/getstudents?departmentAcronym=${departmentAcronym}&batch=${batch}&section=${section}`);
+            if (!res.ok) {
+                setStudents([]);
+                setShowAlert(true);
+                throw new Error('Network response was not ok');
+            }
+            const data = await res.json();
+            if (data.length === 0) {
+                setShowAlert(true);
+            } else {
+                setShowAlert(false);
+            }
+            setStudents(data);
+        } catch (error) {
+            setStudents([]);
+            setShowAlert(true);
+            console.error('Error fetching student data:', error);
+        }
+    } else {
+        setStudents([]);
+        setShowAlert(false);
+    }
+};
