@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Select, FloatingLabel, Alert } from 'flowbite-react';
 import { useFetchDepartments, fetchStudentData } from './useFetchData';
 import { useNavigate } from 'react-router-dom';
+import CookieConsent from "react-cookie-consent";
 
 const yearMapping = {
     1: 'Ist Year',
@@ -98,6 +99,13 @@ const Home = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
+        const storedStudentInfo = JSON.parse(localStorage.getItem('studentInfo'));
+        const storedRollNumber = storedStudentInfo ? storedStudentInfo.rollNumber : null;
+        if (storedRollNumber && storedRollNumber !== studentInfo.rollNumber) {
+            localStorage.removeItem('courseGrades');
+            localStorage.removeItem('numSemesters');
+        }
+
         localStorage.setItem('studentInfo', JSON.stringify(studentInfo));
         navigate('/studentData', { state: { studentInfo } });
     };
@@ -105,7 +113,7 @@ const Home = () => {
     return (
         <div className='mx-4 my-16 md:m-20 items-center justify-center min-h-screen'>
             <div className="p-3 md:p-6 max-w-3xl  mx-auto md:my-7 bg-white rounded-lg shadow-lg">
-                <h1 className="text-2xl md:text-3xl font-semibold text-center text-black m-4">Enter Your Details</h1>
+                <h1 className="text-2xl md:text-3xl font-semibold text-center text-black pb-6">Enter Your Details</h1>
                 <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
                     <Select
                         className='tracking-wider'
@@ -179,7 +187,7 @@ const Home = () => {
                         variant="filled"
                         className='tracking-wider'
                         type="text"
-                        label="Student Name (Eg: ADAM K)"
+                        label="Student Name"
                         value={studentInfo.name}
                         onChange={handleStudentInfoChange}
                         name="name"
@@ -191,18 +199,38 @@ const Home = () => {
                         variant="filled"
                         type="number"
                         className='tracking-wider'
-                        label="Register Number (Eg: 91322104100)"
+                        label="Register Number"
                         value={studentInfo.registerNumber}
                         onChange={handleStudentInfoChange}
                         name="registerNumber"
                         required
                         disabled
                     />
-                    <button type="submit" className="bg-blue-300 text-black text-lg tracking-widest py-3 rounded-lg hover:bg-blue-600 transition duration-300 ease-in-out">
+                    <button type="submit" className="bg-blue-300 text-black text-lg py-3 rounded-lg hover:bg-blue-600 transition-all duration-300 ease-in-out hover:text-white hover:tracking-widest ">
                         Next
                     </button>
                 </form>
-            </div>
+            </div><CookieConsent
+                style={{
+                    background: '#f2f2f2',
+                    color: '#333',
+                    fontSize: '16px',
+                    textAlign: 'left',
+                    borderRadius: '10px',
+                    boxShadow: '0 0 20px rgba(0, 0, 0, 0.2)',
+                }}
+                buttonStyle={{
+                    background: '#0066ff',
+                    color: '#fff',
+                    borderRadius: '10px',
+                    padding: '8px 20px',
+                    fontSize: '16px',
+                    border: 'none',
+                    cursor: 'pointer',
+                }}
+            >
+                This website uses cookies to enhance the user experience.
+            </CookieConsent>
         </div>
     );
 };

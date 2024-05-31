@@ -17,22 +17,30 @@ const StudentData = () => {
     const location = useLocation();
     const { studentInfo } = location.state || {};
     const initialNumSemesters = parseInt(localStorage.getItem('numSemesters')) || 0;
+    const initialNumElectivesPerSemester = JSON.parse(localStorage.getItem('numElectivesPerSemester')) || Array.from({ length: 8 }, () => 0);
+    const initialCourseGrades = JSON.parse(localStorage.getItem('courseGrades')) || [];
     const [numSemesters, setNumSemesters] = useState(initialNumSemesters);
     const [departmentAcronym, setDepartmentAcronym] = useState('');
     const semesters = useFetchSemesters(departmentAcronym);
     const electives = useFetchVerticals(departmentAcronym);
-    const initialNumElectivesPerSemester = JSON.parse(localStorage.getItem('numElectivesPerSemester')) || Array.from({ length: 8 }, () => 0);
     const [numElectivesPerSemester, setNumElectivesPerSemester] = useState(initialNumElectivesPerSemester);
     const [selectedCourses, setSelectedCourses] = useState(Array.from({ length: 8 }, () => []));
     const [selectedElectives, setSelectedElectives] = useState(new Set());
-    const [courseGrades, setCourseGrades] = useState([]);
+    const [courseGrades, setCourseGrades] = useState(initialCourseGrades);
     const [gpa, setGpa] = useState([]);
     const [cgpa, setCgpa] = useState(null);
     const [showTranscript, setShowTranscript] = useState(false);
     const semesterData = semesters.find(semester => semester.department_acronym === departmentAcronym);
     const electiveData = electives.find(elective => elective.department_acronym === departmentAcronym);
 
-    console.log(studentInfo.year, studentInfo.batch, studentInfo.section);
+    useEffect(() => {
+        const storedStudentInfo = JSON.parse(localStorage.getItem('studentInfo'));
+        const storedRollNumber = storedStudentInfo ? storedStudentInfo.rollNumber : null;
+        const studentRollNumber = studentInfo?.rollNumber;
+        if (storedRollNumber !== studentRollNumber) {
+            localStorage.removeItem('courseGrades');
+        }
+    }, [studentInfo]);
 
 
     useEffect(() => {
@@ -43,26 +51,14 @@ const StudentData = () => {
     }, [studentInfo]);
 
     useEffect(() => {
+        setCourseGrades(initialCourseGrades);
+    }, [numSemesters]);
+
+    useEffect(() => {
         localStorage.setItem('numSemesters', numSemesters.toString());
         localStorage.setItem('numElectivesPerSemester', JSON.stringify(numElectivesPerSemester));
+        localStorage.setItem('courseGrades', JSON.stringify(courseGrades));
     }, [numSemesters, selectedCourses, courseGrades, numElectivesPerSemester]);
-
-    useEffect(() => {
-        const storedNumSemesters = parseInt(localStorage.getItem('numSemesters')) || 0;
-        const storedNumElectivesPerSemester = JSON.parse(localStorage.getItem('numElectivesPerSemester')) || Array.from({ length: storedNumSemesters }, () => 0);
-        setNumSemesters(storedNumSemesters);
-        setNumElectivesPerSemester(storedNumElectivesPerSemester);
-    }, []);
-
-    useEffect(() => {
-        setCourseGrades(prevCourseGrades => {
-            const updatedCourseGrades = [...prevCourseGrades];
-            for (let i = updatedCourseGrades.length; i < numSemesters; i++) {
-                updatedCourseGrades.push([]);
-            }
-            return updatedCourseGrades;
-        });
-    }, [numSemesters]);
 
     const handleNumSemestersChange = (event) => {
         setShowTranscript(false);
@@ -273,16 +269,16 @@ const StudentData = () => {
                 )}
                 <form onSubmit={handleSubmit}>
                     <div className="flex flex-col md:flex-row items-center justify-center gap-3 py-4 mt-2">
-                        <Alert color="blue" className="w-full lg:w-1/3 text-md text-center items-center">
+                        <Alert color="blue" className="w-full lg:w-1/3 text-black text-md text-center items-center">
                             Select number of semesters
                         </Alert>
                         <div className="flex flex-row items-center gap-3">
                             <button
                                 type="button"
-                                className="px-4 py-2 bg-blue-200 text-black font-bold hover:bg-blue-400 rounded-lg"
+                                className="px-4 py-2 bg-blue-200 text-black font-bold hover:bg-blue-400 rounded-lg transition-all duration-300"
                                 onClick={() => setNumSemesters(prev => Math.max(prev - 1, 0))}
                             > - </button>
-                            <div className="w-28 items-center">
+                            <div className="w-28 items-center ">
                                 <FloatingLabel
                                     className="text-center items-center font-semibold"
                                     variant='standard'
@@ -296,7 +292,7 @@ const StudentData = () => {
                             </div>
                             <button
                                 type="button"
-                                className="px-4 py-2 bg-blue-200 text-black hover:bg-blue-400 rounded-lg"
+                                className="px-4 py-2 bg-blue-200 text-black hover:bg-blue-400 rounded-lg transition-all duration-300"
                                 onClick={() => setNumSemesters(prev => Math.min(prev + 1, 8))}
                             >+</button>
                         </div>
@@ -344,8 +340,8 @@ const StudentData = () => {
                                                         </div>
                                                         <div className='w-1/2 lg:w-1/3'>
                                                             <Select
-                                                                className=''
                                                                 required
+                                                                value={courseGrades[index]?.[courseIndex]?.grade || ''}
                                                                 onChange={(event) => handleGradeSelect(event, index, courseIndex)}>
                                                                 <option value="">Grade</option>
                                                                 {Object.keys(gradeScale).map((grade) => (
@@ -367,7 +363,7 @@ const StudentData = () => {
                                             <h3 className='py-2 text-lg md:text-2xl'>Select Number of Electives</h3>
                                             <button
                                                 type='button'
-                                                className=' px-4 py-2 bg-blue-200 items-center text-black font-bold hover:bg-blue-400 rounded-lg'
+                                                className=' px-4 py-2 bg-blue-200 items-center text-black font-bold hover:bg-blue-400 rounded-lg transition-all duration-300'
                                                 onClick={() => decrementNumElectives(index)}
                                             >-</button>
                                             <div className='w-20 sm:w-40 items-center '>
@@ -385,7 +381,7 @@ const StudentData = () => {
                                             </div>
                                             <button
                                                 type='button'
-                                                className='px-4 py-2 bg-blue-200 text-black hover:bg-blue-400 rounded-lg'
+                                                className='px-4 py-2 bg-blue-200 text-black hover:bg-blue-400 rounded-lg transition-all duration-300'
                                                 onClick={() => incrementNumElectives(index)}
                                             >+</button>
                                         </div>
@@ -495,8 +491,8 @@ const StudentData = () => {
                         />
                     )}
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
 export default StudentData;
