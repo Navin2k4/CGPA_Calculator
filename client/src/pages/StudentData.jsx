@@ -6,12 +6,7 @@ import { Select, FloatingLabel } from 'flowbite-react';
 import Transcript from '../components/Transcript';
 import HowToUse from '../components/HowToUse';
 const gradeScale = { 'O': 10, 'A+': 9, 'A': 8, 'B+': 7, 'B': 6, 'C': 5, 'U': 0 };
-const yearMapping = {
-    1: 'Ist Year',
-    2: 'IInd Year',
-    3: 'IIIrd Year',
-    4: 'IVth Year'
-};
+const yearMapping = { 1: 'Ist Year', 2: 'IInd Year', 3: 'IIIrd Year', 4: 'IVth Year' };
 
 const StudentData = () => {
     const location = useLocation();
@@ -39,7 +34,10 @@ const StudentData = () => {
         const studentRollNumber = studentInfo?.rollNumber;
         if (storedRollNumber !== studentRollNumber) {
             localStorage.removeItem('courseGrades');
+            localStorage.removeItem('numSemesters');
+            localStorage.removeItem('numElectivesPerSemester');
         }
+        localStorage.setItem('studentInfo', JSON.stringify(studentInfo));
     }, [studentInfo]);
 
 
@@ -51,7 +49,9 @@ const StudentData = () => {
     }, [studentInfo]);
 
     useEffect(() => {
-        setCourseGrades(initialCourseGrades);
+        const updatedCourseGrades = courseGrades.slice(0, numSemesters);
+        setCourseGrades(updatedCourseGrades);
+        localStorage.setItem('courseGrades', JSON.stringify(updatedCourseGrades));
     }, [numSemesters]);
 
     useEffect(() => {
@@ -76,8 +76,8 @@ const StudentData = () => {
         }
     };
 
-    const handleCourseSelect = (event, semesterIndex, electiveIndex, selectedGrade) => {
-        setShowTranscript(false);
+
+    const handleCourseSelect = (event, semesterIndex, electiveIndex) => {
         const selectedCourseValue = event.target.value;
         const updatedSelectedCourses = [...selectedCourses];
         const updatedSelectedElectives = new Set(selectedElectives);
@@ -90,7 +90,7 @@ const StudentData = () => {
                 elective_name: "",
                 elective_code: "",
                 elective_credit: "",
-                grade: selectedGrade,
+                grade: "",
             };
         } else {
             const electiveCourse = electiveData?.verticals
@@ -102,7 +102,7 @@ const StudentData = () => {
                     elective_name: electiveCourse.elective_name,
                     elective_code: electiveCourse.elective_code,
                     elective_credit: electiveCourse.elective_credit,
-                    grade: selectedGrade,
+                    grade: "",
                 };
             }
         }
@@ -111,7 +111,7 @@ const StudentData = () => {
     };
 
     const handleGradeSelect = (event, semesterIndex, courseIndex) => {
-        setShowTranscript(false);
+
         const selectedGrade = event.target.value;
         const updatedCourseGrades = [...courseGrades];
         const course = semesterData.semesters[semesterIndex].courses[courseIndex];
@@ -136,7 +136,7 @@ const StudentData = () => {
     };
 
     const handleChangeNumElectives = (event, index) => {
-        setShowTranscript(false);
+        
         const newValue = parseInt(event.target.value);
         const updatedNumElectivesPerSemester = [...numElectivesPerSemester];
         const updatedSelectedCourses = [...selectedCourses];
@@ -157,14 +157,14 @@ const StudentData = () => {
     };
 
     const incrementNumElectives = (index) => {
-        setShowTranscript(false);
+        
         const updatedNumElectives = [...numElectivesPerSemester];
         updatedNumElectives[index] += 1;
         setNumElectivesPerSemester(updatedNumElectives);
     };
 
     const decrementNumElectives = (index) => {
-        setShowTranscript(false);
+     
         if (numElectivesPerSemester[index] > 0) {
             const updatedNumElectives = [...numElectivesPerSemester];
             const updatedSelectedCourses = [...selectedCourses];
