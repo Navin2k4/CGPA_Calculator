@@ -49,12 +49,12 @@ const Header = () => {
 
 
     return (
-        <Navbar className="bg-[#1f3a6e] px-4 md:px-7 py-4 ring-4 ring-slate-800/10 flex items-center justify-between">
+        <Navbar className="bg-[#1f3a6e] px-4 md:px-7 py-4 ring-4 ring-slate-800/10 flex items-center md:justify-between ">
             <div className="flex items-center space-x-3">
                 <img className="w-12 h-12 md:w-14 md:h-14 rounded-full" src="vcet.jpeg" alt="Logo" />
                 <h1 className="md:text-xl lg:text-2xl font-semibold text-white">CGPA Calculator</h1>
             </div>
-            <div className='flex items-center justify-center gap-3'>
+            <div className='flex flex-col md:flex-row py-4 items-center justify-end gap-3'>
                 
             <Link to='https://leavemanagementsystemvcetmadurai.onrender.com/' target="_blank" rel="noopener noreferrer">
             <Button size="md" color="gray">Leave Application</Button>
@@ -62,7 +62,7 @@ const Header = () => {
             <Link to='https://cgpa-calculator-general.onrender.com/' target="_blank" rel="noopener noreferrer">
             <Button size="md" color="gray">General Calculator</Button>
             </Link>
-            <Button size="md" color="gray" onClick={() => setOpenModal(true)}>Submit Report</Button>
+            <Button size="md" color="gray" className='px-4' onClick={() => setOpenModal(true)}>Submit Report</Button>
             </div>
 
             <Modal className="transition-opacity duration-500" dismissible position="center" show={openModal} size="lg" onClose={() => setOpenModal(false)} popup>
