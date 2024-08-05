@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Navbar, Modal, Button, TextInput, Label } from 'flowbite-react';
 import emailjs from '@emailjs/browser';
-import { Transition } from '@headlessui/react';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
     const [openModal, setOpenModal] = useState(false);
@@ -49,12 +49,22 @@ const Header = () => {
 
 
     return (
-        <Navbar className="bg-slate-200 px-4 md:px-7 py-3 ring-4 ring-slate-800/10 flex items-center justify-between">
+        <Navbar className="bg-[#1f3a6e] px-4 md:px-7 py-4 ring-4 ring-slate-800/10 flex items-center justify-between">
             <div className="flex items-center space-x-3">
                 <img className="w-12 h-12 md:w-14 md:h-14 rounded-full" src="vcet.jpeg" alt="Logo" />
-                <h1 className="md:text-xl lg:text-2xl font-semibold text-black">CGPA Calculator</h1>
+                <h1 className="md:text-xl lg:text-2xl font-semibold text-white">CGPA Calculator</h1>
             </div>
-            <Button size="md" color="dark" onClick={() => setOpenModal(true)}>Submit Report</Button>
+            <div className='flex items-center justify-center gap-3'>
+                
+            <Link to='https://leavemanagementsystemvcetmadurai.onrender.com/' target="_blank" rel="noopener noreferrer">
+            <Button size="md" color="gray">Leave Application</Button>
+            </Link>
+            <Link to='https://cgpa-calculator-general.onrender.com/' target="_blank" rel="noopener noreferrer">
+            <Button size="md" color="gray">General Calculator</Button>
+            </Link>
+            <Button size="md" color="gray" onClick={() => setOpenModal(true)}>Submit Report</Button>
+            </div>
+
             <Modal className="transition-opacity duration-500" dismissible position="center" show={openModal} size="lg" onClose={() => setOpenModal(false)} popup>
                 <Modal.Header className="m-3">Submit Report</Modal.Header>
                 <Modal.Body>

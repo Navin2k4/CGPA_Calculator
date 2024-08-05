@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 
 export const useFetchDepartments = () => {
     const [departments, setDepartments] = useState([]);
+    console.log(departments);
+    
     useEffect(() => {
         const fetchDepartments = async () => {
             try {

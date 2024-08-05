@@ -27,7 +27,24 @@ const Home = () => {
     });
     const [students, setStudents] = useState([]);
     const [showAlert, setShowAlert] = useState(false);
-    const departments = useFetchDepartments();
+    // const departments = useFetchDepartments();
+    const [departments, setDepartments] = useState([]);
+    console.log(departments);
+    
+    useEffect(() => {
+        const fetchDepartments = async () => {
+            try {
+                const res = await fetch(`/api/departments/getdepartments`);
+                const data = await res.json();
+                if (res.ok) {
+                    setDepartments(data);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        fetchDepartments();
+    }, []);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -112,105 +129,130 @@ const Home = () => {
 
     return (
         <div className='mx-4 my-16 md:m-20 items-center justify-center min-h-screen'>
-            <div className="p-3 md:p-6 max-w-3xl  mx-auto md:my-7 bg-white rounded-lg shadow-lg">
-                <h1 className="text-2xl md:text-3xl font-semibold text-center text-black pb-6">Enter Your Details</h1>
-                <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
-                    <Select
-                        className='tracking-wider'
-                        value={studentInfo.department}
-                        onChange={handleStudentInfoChange}
-                        name="department"
-                        required
-                    >
-                        <option value="">Select Department</option>
-                        {departments.map((department) => (
-                            <option key={department._id} value={`${department.department_acronym} - ${department.department_name}`}>
-                                {`${department.department_name} (${department.department_acronym})`}
-                            </option>
-                        ))}
-                    </Select>
-                    <div className='flex flex-col sm:flex-row gap-2'>
-                        <Select
-                            name="batch"
-                            value={studentInfo.batch}
-                            onChange={handleStudentInfoChange}
-                            required
-                            className='w-full tracking-wider'
-                        >
-                            <option value="">Select Batch</option>
-                            {years.map(year => (
-                                <option key={year} value={`${year}-${year + 4}`}>
-                                    {year}-{year + 4}
-                                </option>
-                            ))}
-                        </Select>
+<div className="p-6 max-w-3xl mx-auto bg-[#244784] rounded-lg shadow-lg">
+  <h1 className="text-2xl md:text-3xl font-bold text-center text-gray-100 mb-6">Enter Your Details</h1>
+  <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+    
+    <Select
+      className="bg-[#1f2937] text-gray-100 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all duration-300"
+      value={studentInfo.department}
+      onChange={handleStudentInfoChange}
+      name="department"
+      required
+    >
+      <option value="">Select Department</option>
+      {departments.map((department) => (
+        <option key={department._id} value={`${department.department_acronym} - ${department.department_name}`}>
+          {`${department.department_name} (${department.department_acronym})`}
+        </option>
+      ))}
+    </Select>
 
-                        <Select name="year" className='w-full tracking-wider' value={studentInfo.year} onChange={handleStudentInfoChange} required>
-                            <option value="">Select Year</option>
-                            {Object.entries(yearMapping).map(([yearNumber, yearText]) => (
-                                <option key={yearNumber} value={yearNumber}>
-                                    {yearText}
-                                </option>
-                            ))}
-                        </Select>
+    <div className="flex flex-col sm:flex-row gap-4">
+      <Select
+        name="batch"
+        value={studentInfo.batch}
+        onChange={handleStudentInfoChange}
+        required
+        className="w-full bg-[#1f2937] text-gray-100 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all duration-300"
+      >
+        <option value="">Select Batch</option>
+        {years.map((year) => (
+          <option key={year} value={`${year}-${year + 4}`}>
+            {year}-{year + 4}
+          </option>
+        ))}
+      </Select>
 
-                        <Select
-                            name="section"
-                            value={studentInfo.section}
-                            onChange={handleStudentInfoChange}
-                            required
-                            className='w-full tracking-wider'
-                        >
-                            <option value="">Select Section</option>
-                            <option value="A">A</option>
-                            <option value="B">B</option>
-                            <option value="C">C</option>
-                        </Select>
-                    </div>
-                    {showAlert && <Alert color='blue' className='text-center capitalize items-center'>Data not yet uploaded</Alert>}
-                    <Select
-                        className='tracking-wider'
-                        value={studentInfo.rollNumber}
-                        onChange={handleStudentInfoChange}
-                        name="rollNumber"
-                        disabled={!students.length}
-                        required
-                    >
-                        <option value="">Select Roll Number</option>
-                        {students.map((student) => (
-                            <option key={student._id} value={student.roll_no}>
-                                {student.roll_no}
-                            </option>
-                        ))}
-                    </Select>
-                    <FloatingLabel
-                        variant="filled"
-                        className='tracking-wider'
-                        type="text"
-                        label="Student Name"
-                        value={studentInfo.name}
-                        onChange={handleStudentInfoChange}
-                        name="name"
-                        required
-                        disabled
-                    />
+      <Select
+        name="year"
+        value={studentInfo.year}
+        onChange={handleStudentInfoChange}
+        required
+        className="w-full bg-[#1f2937] text-gray-100 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all duration-300"
+      >
+        <option value="">Select Year</option>
+        {Object.entries(yearMapping).map(([yearNumber, yearText]) => (
+          <option key={yearNumber} value={yearNumber}>
+            {yearText}
+          </option>
+        ))}
+      </Select>
 
-                    <FloatingLabel
-                        variant="filled"
-                        type="number"
-                        className='tracking-wider'
-                        label="Register Number"
-                        value={studentInfo.registerNumber}
-                        onChange={handleStudentInfoChange}
-                        name="registerNumber"
-                        required
-                        disabled
-                    />
-                    <button type="submit" className="bg-blue-300 text-black text-lg py-3 rounded-lg hover:bg-blue-600 transition-all duration-300 ease-in-out hover:text-white hover:tracking-widest ">
-                        Next
-                    </button>
-                </form>
-            </div><CookieConsent
+      <Select
+        name="section"
+        value={studentInfo.section}
+        onChange={handleStudentInfoChange}
+        required
+        className="w-full bg-[#1f2937] text-gray-100 border border-gray-700 rounded-lg  focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all duration-300"
+      >
+        <option value="">Select Section</option>
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+      </Select>
+    </div>
+
+    {showAlert && (
+      <Alert className="text-center bg-red-600 text-white p-3 rounded-lg">
+        Data not yet uploaded !
+      </Alert>
+    )}
+
+    <Select
+      className="bg-[#1f2937] text-gray-100 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all duration-300"
+      value={studentInfo.rollNumber}
+      onChange={handleStudentInfoChange}
+      name="rollNumber"
+      disabled={!students.length}
+      required
+    >
+      <option value="">Select Roll Number</option>
+      {students.map((student) => (
+        <option key={student._id} value={student.roll_no}>
+          {student.roll_no}
+        </option>
+      ))}
+    </Select>
+<div>
+
+    <FloatingLabel
+      variant="filled"
+      className="bg-[#1f2937] text-gray-100 border border-gray-700 rounded-lg  focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all duration-300"
+      type="text"
+      label="Student Name"
+      value={studentInfo.name}
+      onChange={handleStudentInfoChange}
+      name="name"
+      required
+      disabled
+    />
+
+    <FloatingLabel
+      variant="filled"
+      type="number"
+      className="bg-[#1f2937] text-gray-100 border border-gray-700 rounded-lg  focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all duration-300"
+      label="Register Number"
+      value={studentInfo.registerNumber}
+      onChange={handleStudentInfoChange}
+      name="registerNumber"
+      required
+      disabled
+      />
+
+</div>
+    <button
+      type="submit"
+      className="bg-gradient-to-br from-blue-500 to-blue-800 text-gray-100 text-lg py-3 rounded-lg hover:bg-blue-600 transition-all duration-300 ease-in-out"
+      >
+      Next
+    </button>
+  </form>
+</div>
+
+
+            
+            <CookieConsent
                 style={{
                     background: '#f2f2f2',
                     color: '#333',

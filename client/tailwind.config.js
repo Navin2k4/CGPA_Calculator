@@ -6,7 +6,11 @@ export default {
     flowbite.content(),
   ],
   theme: {
-    extend: {},
+    extend: {
+      transitionProperty: {
+        'background-color': 'background-color, background-image',
+      },
+    },
   },
   plugins: [
     flowbite.plugin(),
